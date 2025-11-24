@@ -1,0 +1,157 @@
+drop function fn_read_partners()
+CREATE OR REPLACE FUNCTION fn_read_partners()
+returns table(
+  socio_id INT,
+  nombre VARCHAR,
+  porcentaje_participacion DECIMAL,
+  email VARCHAR,
+  telefono VARCHAR,
+  inversion_inicial DECIMAL,
+  ganancia_neta DECIMAL,
+  rol_nombre varchar,
+  ventas_generadas int,
+  gastos_generados int,
+  msj_tipo text,
+  msj_texto text
+)
+language plpgsql
+as $$
+begin 
+  if exists (select 1 from t_socios) then 
+    return query 
+      select 
+        soc.socio_id,
+        soc.nombre,
+        soc.porcentaje_participacion,
+        soc.email,
+        soc.telefono,
+        soc.inversion_inicial,
+        soc.ganancia_neta,
+        r.nombre AS rol_nombre,
+        soc.ventas_generadas,
+        soc.gastos_generados,
+        'success' as msj_tipo,
+        'Exito al realizar la accion' as msj_texto
+      from t_socios soc
+      left join t_roles_socios r
+        on r.roles_socios_id = soc.rol_id;
+
+  else 
+    return query
+      select 
+        NULL::INT,
+        NULL::VARCHAR,
+        NULL::DECIMAL,
+        NULL::VARCHAR,
+        NULL::VARCHAR,
+        NULL::DECIMAL,
+        NULL::DECIMAL,
+        NULL::varchar,
+        NULL::INT,
+        NULL::INT,
+        'warning' as msj_tipo,
+        'Actualmente no hay socios registrados.' as msj_texto;
+  end if;
+
+exception when others then 
+  return query
+    select 
+      NULL::INT,
+      NULL::VARCHAR,
+      NULL::DECIMAL,
+      NULL::VARCHAR,
+      NULL::VARCHAR,
+      NULL::DECIMAL,
+      NULL::DECIMAL,
+      NULL::varchar,
+      NULL::INT,
+      NULL::INT,
+      'error' as msj_tipo,
+      sqlerrm as msj_texto;
+end
+$$;
+
+
+select * from fn_read_partners()
+select * from fn_read_ventas()
+select * from t_clientes
+select * from t_roles_socios
+drop function fn_read_ventas()
+
+CREATE OR REPLACE FUNCTION fn_read_ventas()
+RETURNS TABLE(
+  venta_id INT,
+  fecha TIMESTAMP,
+  cliente_nombre VARCHAR,
+  servicio_nombre VARCHAR,
+  monto DECIMAL,
+  metodo_pago VARCHAR,
+  socios_participantes TEXT,
+  msj_tipo TEXT,
+  msj_texto TEXT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM t_ventas) THEN
+    RETURN QUERY
+      SELECT 
+        v.venta_id,
+        v.fecha,
+        c.nombre AS cliente_nombre,
+        s.nombre AS servicio_nombre,
+        v.monto,
+        v.metodo_pago,
+        COALESCE(
+          STRING_AGG(so.nombre, ', ' ORDER BY so.nombre),
+          'Sin socios'
+        ) AS socios_participantes,
+        'success' AS msj_tipo,
+        'Éxito al realizar la acción' AS msj_texto
+      FROM t_ventas v
+      LEFT JOIN t_clientes c 
+        ON c.cliente_id = v.cliente_id
+      LEFT JOIN t_servicios s 
+        ON s.servicio_id = v.servicio_id
+      LEFT JOIN t_ventas_socios vs 
+        ON vs.venta_id = v.venta_id
+      LEFT JOIN t_socios so 
+        ON so.socio_id = vs.socio_id
+      GROUP BY 
+        v.venta_id, 
+        v.fecha, 
+        c.nombre, 
+        s.nombre, 
+        v.monto, 
+        v.metodo_pago;
+
+  ELSE
+    RETURN QUERY
+      SELECT 
+        NULL::INT,
+        NULL::TIMESTAMP,
+        NULL::VARCHAR,
+        NULL::VARCHAR,
+        NULL::DECIMAL,
+        NULL::VARCHAR,
+        NULL::TEXT,
+        'warning' AS msj_tipo,
+        'Actualmente no hay ventas registradas.' AS msj_texto;
+  END IF;
+
+EXCEPTION WHEN OTHERS THEN
+  RETURN QUERY
+    SELECT 
+      NULL::INT,
+      NULL::TIMESTAMP,
+      NULL::VARCHAR,
+      NULL::VARCHAR,
+      NULL::DECIMAL,
+      NULL::VARCHAR,
+      NULL::TEXT,
+      'error'::TEXT AS msj_tipo,
+      sqlerrm::TEXT as msj_texto;
+END
+$$;
+
+

@@ -1,0 +1,372 @@
+DROP FUNCTION fn_create_partners(
+  character varying,
+  numeric,
+  character varying,
+  character varying,
+  numeric,
+  numeric,
+  integer,
+  integer,
+  integer
+);
+
+select * from t_roles_socios
+
+CREATE OR REPLACE function fn_create_partners(
+  p_nombre varchar,
+  p_porcentar_participacion decimal,
+  p_email varchar,
+  p_telefono varchar,
+  p_inversion_inicial decimal,
+  p_ganancian_neta decimal,
+  p_ventas_generadas int,
+  p_gastos_generados int,
+  p_rol_id int
+)
+returns table(
+  msj_tipo text,
+  msj_texto text
+)
+
+as $$
+begin
+  -- validar campos obligatorios 
+  IF trim(p_nombre) = '' 
+   OR p_porcentar_participacion IS NULL
+   OR trim(p_email) = '' 
+   OR trim(p_telefono) = ''
+   OR p_inversion_inicial IS NULL
+   OR p_ganancian_neta IS NULL
+   or p_ventas_generadas IS NULL
+   or p_gastos_generados IS NULL
+   OR p_rol_id IS NULL
+    THEN
+  return query
+    select 'warning', 'Debe completar todos los campos';
+  return;
+  end if;
+  begin
+    insert into t_socios (
+      nombre, porcentaje_participacion, email, telefono, inversion_inicial, ganancia_neta, ventas_generadas, gastos_generados, rol_id
+    )
+    values(p_nombre,p_porcentar_participacion,p_email,p_telefono,p_inversion_inicial,p_ganancian_neta, p_ventas_generadas, p_gastos_generados, p_rol_id);
+    return query
+    select 'success', 'Socio agregado correctamente.';
+    return;
+
+    exception when others then
+    return query
+    select 'error', 'Error al insertar: ' || sqlerrm;
+    return;
+  end;
+end;
+$$ language plpgsql;
+
+
+SELECT * FROM fn_create_partners(
+  'Esteban Pizarro',
+  35,
+  'elias@gmail.com',
+  '83745485',
+  20000.00,
+  0.00,
+  0,
+  0,
+  1
+);
+
+
+
+
+select * from fn_read_partners()
+
+CREATE OR REPLACE function fn_create_roles(
+  p_nombre varchar,
+  p_descripcion text
+)
+returns table(
+  msj_tipo text,
+  msj_texto text
+)
+
+as $$
+begin
+  -- validar campos obligatorios 
+  IF trim(p_nombre) = '' 
+   OR trim(p_descripcion) = '' then
+  return query
+    select 'warning', 'Debe completar todos los campos';
+  return;
+  end if;
+  begin
+    insert into t_roles_socios (
+      nombre, descripcion
+    )
+    values(p_nombre,p_descripcion);
+    return query
+    select 'success', 'Rol de socio agregado correctamente.';
+    return;
+
+    exception when others then
+    return query
+    select 'error', 'Error al insertar: ' || sqlerrm;
+    return;
+  end;
+end;
+$$ language plpgsql;
+
+SELECT * FROM t_ventas
+
+select * from fn_read_ventas
+
+CREATE OR REPLACE FUNCTION fn_create_venta(
+  p_fecha DATE,
+  p_cliente_id INT,
+  p_servicio_id INT,
+  p_monto DECIMAL,
+  p_metodo_pago VARCHAR,
+  p_socios INT[]    
+)
+RETURNS TABLE(
+  msj_tipo TEXT,
+  msj_texto TEXT
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  v_venta_id INT;
+  v_cantidad_socios INT;
+  v_monto_por_socio DECIMAL;
+BEGIN
+  -- Validar campos obligatorios
+  IF p_fecha IS NULL
+     OR p_cliente_id IS NULL
+     OR p_servicio_id IS NULL
+     OR p_monto IS NULL
+     OR p_metodo_pago IS NULL THEN
+    RETURN QUERY
+      SELECT 'warning', 'Debe completar todos los campos obligatorios';
+    RETURN;
+  END IF;
+
+  -- Validar que el cliente exista
+  IF NOT EXISTS (SELECT 1 FROM t_clientes WHERE cliente_id = p_cliente_id) THEN
+    RETURN QUERY
+      SELECT 'warning', 'El cliente seleccionado no existe';
+    RETURN;
+  END IF;
+
+  -- Validar servicio
+  IF NOT EXISTS (SELECT 1 FROM t_servicios WHERE servicio_id = p_servicio_id) THEN
+    RETURN QUERY
+      SELECT 'warning', 'El servicio seleccionado no existe';
+    RETURN;
+  END IF;
+
+  -- Validar socios participantes
+  IF p_socios IS NULL OR array_length(p_socios, 1) = 0 THEN
+    RETURN QUERY
+      SELECT 'warning', 'Debe seleccionar al menos un socio para la venta';
+    RETURN;
+  END IF;
+
+  -- Contar socios
+  v_cantidad_socios := array_length(p_socios, 1);
+
+  -- Calcular monto por socio
+  v_monto_por_socio := p_monto / v_cantidad_socios;
+
+  -- Crear la venta
+  INSERT INTO t_ventas(
+    fecha,
+    cliente_id,
+    servicio_id,
+    monto,
+    metodo_pago
+  )
+  VALUES(
+    p_fecha,
+    p_cliente_id,
+    p_servicio_id,
+    p_monto,
+    p_metodo_pago
+  )
+  RETURNING venta_id INTO v_venta_id;
+
+  -- Insertar socios participantes
+  INSERT INTO t_ventas_socios(venta_id, socio_id)
+  SELECT v_venta_id, unnest(p_socios);
+
+  -- Actualizar ventas generadas correctamente (solo la parte que le toca)
+  UPDATE t_socios
+  SET ventas_generadas = ventas_generadas + v_monto_por_socio
+  WHERE socio_id = ANY(p_socios);
+
+  RETURN QUERY
+    SELECT 'success', 'La venta fue registrada con éxito';
+
+EXCEPTION WHEN OTHERS THEN
+  RETURN QUERY
+    SELECT 'error', SQLERRM;
+END
+$$;
+
+
+CREATE OR REPLACE FUNCTION fn_create_cliente(
+  p_nombre VARCHAR,
+  p_email VARCHAR,
+  p_telefono VARCHAR,
+  p_vehiculo VARCHAR,
+  p_placa VARCHAR,
+  p_rol_cliente_id INT
+)
+RETURNS TABLE(
+  msj_tipo TEXT,
+  msj_texto TEXT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  -- Validar campos obligatorios
+  IF trim(p_nombre) = '' THEN
+    RETURN QUERY
+      SELECT 'warning', 'Debe ingresar el nombre del cliente';
+    RETURN;
+  END IF;
+
+  IF trim(p_email) = '' THEN
+    RETURN QUERY
+      SELECT 'warning', 'Debe ingresar el email del cliente';
+    RETURN;
+  END IF;
+
+  IF trim(p_telefono) = '' THEN
+    RETURN QUERY
+      SELECT 'warning', 'Debe ingresar el teléfono del cliente';
+    RETURN;
+  END IF;
+
+  -- Validar rol (opcional)
+  IF p_rol_cliente_id IS NOT NULL AND
+     NOT EXISTS (SELECT 1 FROM t_roles_clientes WHERE roles_clientes_id = p_rol_cliente_id) THEN
+    RETURN QUERY
+      SELECT 'warning', 'El rol de cliente no existe';
+    RETURN;
+  END IF;
+
+  -- Insertar cliente
+  INSERT INTO t_clientes(
+    nombre,
+    email,
+    telefono,
+    vehiculo,
+    placa,
+    rol_cliente_id
+  )
+  VALUES(
+    p_nombre,
+    p_email,
+    p_telefono,
+    p_vehiculo,
+    p_placa,
+    p_rol_cliente_id
+  );
+
+  RETURN QUERY
+    SELECT 'success', 'Cliente registrado con éxito';
+
+EXCEPTION WHEN OTHERS THEN
+  RETURN QUERY
+    SELECT 'error', SQLERRM;
+END
+$$;
+
+
+
+
+CREATE OR REPLACE FUNCTION fn_create_servicio(
+  p_nombre VARCHAR,
+  p_descripcion TEXT,
+  p_precio_base DECIMAL
+)
+RETURNS TABLE(
+  msj_tipo TEXT,
+  msj_texto TEXT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  -- Validar campos obligatorios
+  IF trim(p_nombre) = '' THEN
+    RETURN QUERY
+      SELECT 'warning', 'Debe ingresar el nombre del servicio';
+    RETURN;
+  END IF;
+
+  IF p_precio_base IS NULL OR p_precio_base < 0 THEN
+    RETURN QUERY
+      SELECT 'warning', 'Debe ingresar un precio base válido';
+    RETURN;
+  END IF;
+
+  -- Insertar servicio
+  INSERT INTO t_servicios(
+    nombre,
+    descripcion,
+    precio_base
+  )
+  VALUES(
+    p_nombre,
+    p_descripcion,
+    p_precio_base
+  );
+
+  RETURN QUERY
+    SELECT 'success', 'Servicio registrado con éxito';
+
+EXCEPTION WHEN OTHERS THEN
+  RETURN QUERY
+    SELECT 'error', SQLERRM;
+END
+$$;
+
+select * from fn_create_servicio('Premium', 'Todo lo del Lavado Completo (Popular)|Encerado y pulido exterior|Limpieza profunda de asientos y alfombras|Aspirado completo del interior|Limpieza y protección de plásticos y paneles internos|Tratamiento especial de llantas y neumáticos|Limpieza de motor|Desinfección completa|Aromatizante premium dentro del vehículo|Protección UV', 15000)
+select * from t_servicios
+
+
+CREATE OR REPLACE FUNCTION fn_create_role_client(
+  p_nombre varchar
+)
+returns table(
+  msj_tipo text,
+  msj_texto text
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  -- Validar campos obligatorios
+  IF trim(p_nombre) = '' THEN
+    RETURN QUERY
+      SELECT 'warning', 'Debe ingresar el nombre del rol';
+    RETURN;
+  END IF;
+
+  -- Insertar servicio
+  INSERT INTO t_roles_clientes(
+    nombre
+  )
+  VALUES(
+    p_nombre
+  );
+
+  RETURN QUERY
+    SELECT 'success', 'Rol registrado con éxito';
+
+EXCEPTION WHEN OTHERS THEN
+  RETURN QUERY
+    SELECT 'error', SQLERRM;
+END
+$$;
+
+SELECT * FROM fn_create_role_client('VIP')
+
