@@ -2,7 +2,8 @@ import { Router } from 'express'
 import {
     ReadPartners,
     CreatePartner,
-    UpdateTotalPartner
+    UpdateTotalPartner,
+    readWithIdPartner
 } from '../controller/partners.controller.js'
 import {
     createClient
@@ -21,7 +22,7 @@ const routes = Router()
 routes.get("/read-partners", ReadPartners)
 routes.post("/create-partner", CreatePartner)
 routes.put("/update-partner", UpdateTotalPartner)
-
+routes.get("/read-with-id/:id", readWithIdPartner)
 
 // ROUTES FOR CLIENTS
 routes.post("/create-client", createClient)

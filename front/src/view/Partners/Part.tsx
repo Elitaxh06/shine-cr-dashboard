@@ -10,6 +10,9 @@ import { readPartners } from "../../service/partners.services"   // <-- tu funci
 import type { ApiResponsePartners, Partner } from "../../types"
 import { Loader1 } from "../../components/loaders/loader1"
 
+import { updateTotalPartner } from "../../service/partners.services"
+
+
 function Part() {
 
     const [partnersResponse, setPartnersResponse] = useState<ApiResponsePartners | null>(null)
@@ -25,6 +28,7 @@ function Part() {
       setPartners(data?.datos ?? [])
 
       setLoading(false)
+      // const partnerId = data?.datos?.[0]?.socio_id
       
     } catch (error) {
       console.log("Error al obtener los datos", error)
@@ -33,6 +37,8 @@ function Part() {
     }
   }
   
+
+
   useEffect(() => {
     setTimeout(() => {
       getInitialData()
@@ -113,7 +119,7 @@ function Part() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalInversion.toLocaleString()}</div>
+            <div className="text-2xl font-bold">₡{totalInversion.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">Capital invertido</p>
           </CardContent>
         </Card>
@@ -124,7 +130,7 @@ function Part() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${utilidadNeta.toLocaleString()}</div>
+            <div className="text-2xl font-bold">₡{utilidadNeta.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">Ganancias a distribuir</p>
           </CardContent>
         </Card>
@@ -220,7 +226,7 @@ function Part() {
                   <div className="flex justify-between text-sm pt-2 border-t">
                     <span className="text-muted-foreground">Inversión</span>
                     <span className="font-semibold">
-                      ${s.inversion_inicial.toLocaleString()}
+                      ₡{s.inversion_inicial.toLocaleString()}
                     </span>
                   </div>
                 )}
@@ -228,7 +234,7 @@ function Part() {
                 <div className="flex justify-between text-sm pt-2 border-t">
                   <span className="font-medium">Ganancia Neta</span>
                   <span className="font-bold text-green-600">
-                    ${s.ganancia.toLocaleString()}
+                    ₡{s.ganancia.toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -247,6 +253,13 @@ function Part() {
                   />
                 </div>
               )}
+              <button
+                // onClick={}
+                className="cursor-pointer font-semibold p-2 rounded-lg bg-black text-white hover:scale-105 transition-transform duration-100"
+               >
+              Editar Socio
+              </button>
+
             </CardContent>
           </Card>
         ))}
@@ -270,21 +283,21 @@ function Part() {
               <div>
                 <div className="text-sm text-muted-foreground">Total Ventas</div>
                 <div className="text-xl font-bold text-green-600">
-                  ${totalVentas.toLocaleString()}
+                  ₡{totalVentas.toLocaleString()}
                 </div>
               </div>
 
               <div>
                 <div className="text-sm text-muted-foreground">Total Gastos</div>
                 <div className="text-xl font-bold text-red-600">
-                  ${totalGastos.toLocaleString()}
+                  ₡{totalGastos.toLocaleString()}
                 </div>
               </div>
 
               <div>
                 <div className="text-sm text-muted-foreground">Utilidad Neta</div>
                 <div className="text-xl font-bold text-primary">
-                  ${utilidadNeta.toLocaleString()}
+                  ₡{utilidadNeta.toLocaleString()}
                 </div>
               </div>
             </div>
@@ -306,10 +319,10 @@ function Part() {
 
                   <div className="text-right">
                     <div className="text-sm text-muted-foreground">
-                      {s.porcentaje_participacion}% de ${utilidadNeta.toLocaleString()}
+                      {s.porcentaje_participacion}% de ₡{utilidadNeta.toLocaleString()}
                     </div>
                     <div className="text-xl font-bold text-primary">
-                      ${s.ganancia.toLocaleString()}
+                      ₡{s.ganancia.toLocaleString()}
                     </div>
                   </div>
                 </div>
