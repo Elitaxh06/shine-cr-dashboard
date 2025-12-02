@@ -74,9 +74,9 @@ export const updateTotalPartner = async (params: UpdateTotalParams): Promise<Api
         )
         if(data.resultadoTipo === 'error' || data.resultadoTipo === 'warning'){
             Swal.fire({
-                icon: "info",
+                icon: "error",
                 title: "Para su informacion",
-                text: data.resultadoTexto
+                text: 'Hubo un error inesperado al actualizar el socio'
             })
         }
 
@@ -88,6 +88,40 @@ export const updateTotalPartner = async (params: UpdateTotalParams): Promise<Api
             })
             return data
         }
+
+    }catch(error){
+        Swal.fire({
+            icon: "error",
+            title: "Para su informacion",
+            text: "Error al obtener los datos"
+        })
+        console.log('Error al obtener los datos', error)
+        return null
+    }
+}
+
+
+export const readWithIdPartner = async(socioId: number):Promise<ApiResponsePartners | null> => {
+    try{
+        const { data } = await axios.get<ApiResponsePartners>(
+            import.meta.env.VITE_API_READ_WITH_ID_PARTNER + socioId,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        )
+        if(data.resultadoTipo === 'error' || data.resultadoTipo === 'warning'){
+            Swal.fire({
+                icon: "info",
+                title: "Para su informacion",
+                text: data.resultadoTexto
+            })
+            return null
+        }
+        console.log(data)
+        return data
+
 
     }catch(error){
         Swal.fire({

@@ -211,7 +211,7 @@ function Sales(){
                       <TableCell className="w-20">{new Date(sale.fecha).toLocaleDateString()}</TableCell>
                       <TableCell className="font-medium w-20">{sale.cliente_nombre}</TableCell>
                       <TableCell className="w-20">{sale.servicio_nombre}</TableCell>
-                      <TableCell className="font-semibold w-20">${sale.monto}</TableCell>
+                      <TableCell className="font-semibold w-20">₡{sale.monto}</TableCell>
                       <TableCell className="w-20">
                         <button className="p-2 border-2 rounded-md w-16 h-8 flex items-center justify-center text-black cursor-sw-resize">
                             {sale.metodo_pago}

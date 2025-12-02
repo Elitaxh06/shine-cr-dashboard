@@ -21,7 +21,7 @@ const routes = Router()
 // ROUTES FRO PARTNERS
 routes.get("/read-partners", ReadPartners)
 routes.post("/create-partner", CreatePartner)
-routes.put("/update-partner", UpdateTotalPartner)
+routes.put("/update-partner/:id", UpdateTotalPartner)
 routes.get("/read-with-id/:id", readWithIdPartner)
 
 // ROUTES FOR CLIENTS

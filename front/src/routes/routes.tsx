@@ -6,6 +6,7 @@ function RoutesMain() {
     return (
         <Routes>
             <Route path="/" element={<Part />} />
+            <Route path="/partners" element={<Part />} />   
             <Route path="/sales" element={<Sales />} />
             <Route path="/edit-partner" element={<EditPartner />} />
         </Routes>

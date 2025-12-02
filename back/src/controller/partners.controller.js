@@ -103,6 +103,7 @@ export const CreatePartner = async (req, res) => {
 export const UpdateTotalPartner = async (req, res) => {
     try{
         const {  p_socio_id,p_nombre,p_porcentaje_participacion,p_email,p_telefono,p_inversion_inicial,p_ganancia_neta,p_rol_id,p_ventas_generadas,p_gastos_generados } = req.body
+
         const { data } = await axios.post(
             process.env.URL_UPDATE_PARTNER,
             {p_socio_id,p_nombre,p_porcentaje_participacion,p_email,p_telefono,p_inversion_inicial,p_ganancia_neta,p_rol_id,p_ventas_generadas,p_gastos_generados},
@@ -111,7 +112,8 @@ export const UpdateTotalPartner = async (req, res) => {
                     "Content-Type": "application/json",
                     "apikey": process.env.API_KEY,
                     "Authorization": `Bearer ${process.env.AUTHORIZATOIN}`
-                }
+                },
+                validateStatus: () => true
             }
         )
 
@@ -141,8 +143,9 @@ export const UpdateTotalPartner = async (req, res) => {
         return res.json(result)
 
     }catch(error){
-        console.log(res.json({message: error.message}))
-        return res.status(500).json({message: error.message})
+        // make sure we reference the caught error variable and provide a helpful message
+        console.error('Error in UpdateTotalPartner:', error)
+        return res.status(500).json({ resultadoTipo: 'error', respuestaMensaje: error?.message ?? 'unknown error' });
     }
 }
 
@@ -188,7 +191,7 @@ export const readWithIdPartner = async (req, res) => {
 
 
     }catch(error){
-        console.log(error.message)
+        console.log(json({message: error.message}))
         return res.status(500).json({ message: error.message })
     }
 }

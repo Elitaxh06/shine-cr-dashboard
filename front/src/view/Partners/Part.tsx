@@ -5,21 +5,21 @@ import { Avatar, AvatarFallback } from "../../components/ui/avatar"
 import { Progress } from "../../components/ui/progress"
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Legend } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../../components/ui/chart"
-
-import { readPartners } from "../../service/partners.services"   // <-- tu función
+import { useNavigate } from "react-router-dom"
+import { readPartners, readWithIdPartner } from "../../service/partners.services"   // <-- tu función
 import type { ApiResponsePartners, Partner } from "../../types"
 import { Loader1 } from "../../components/loaders/loader1"
-
-import { updateTotalPartner } from "../../service/partners.services"
-
+import { useDispatch } from "react-redux"
+import { setPartner } from "../../store"
 
 function Part() {
 
-    const [partnersResponse, setPartnersResponse] = useState<ApiResponsePartners | null>(null)
-    const [partners, setPartners] = useState<Partner[]>([])
-    const [loading, setLoading] = useState(true)
+  const [partnersResponse, setPartnersResponse] = useState<ApiResponsePartners | null>(null)
+  const [partners, setPartners] = useState<Partner[]>([])
+  const [loading, setLoading] = useState(true)
 
-
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
   const getInitialData = async () => {
     try {
       const data = await readPartners()
@@ -36,15 +36,23 @@ function Part() {
       setLoading(false)
     }
   }
+  const editPartner = async(id: number) =>{
+    const result = await readWithIdPartner(id)
+
+    if(result){
+      dispatch(setPartner(result?.datos))
+      navigate('/edit-partner')
+    }
+  }
   
-
-
   useEffect(() => {
     setTimeout(() => {
       getInitialData()
 
     }, 0)
   }, [])
+
+
 
   if (loading) {
     return (
@@ -254,7 +262,7 @@ function Part() {
                 </div>
               )}
               <button
-                // onClick={}
+                onClick={() => editPartner(s.socio_id)}
                 className="cursor-pointer font-semibold p-2 rounded-lg bg-black text-white hover:scale-105 transition-transform duration-100"
                >
               Editar Socio
