@@ -56,7 +56,7 @@ function Part() {
 
   if (loading) {
     return (
-      <div className="p-6 text-center text-lg font-semibold text-primary">
+      <div className="pt-52">
         <Loader1 />
       </div>
     )

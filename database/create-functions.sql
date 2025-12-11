@@ -370,3 +370,201 @@ $$;
 
 SELECT * FROM fn_create_role_client('VIP')
 
+
+CREATE OR REPLACE function fn_create_categoria_inventario(
+  p_nombre varchar
+)
+returns table(
+  msj_tipo text,
+  msj_texto text
+)
+
+as $$
+begin
+  -- validar campos obligatorios 
+  IF trim(p_nombre) = '' then
+  return query
+    select 'warning', 'Debes completar el nombre.';
+  return;
+  end if;
+  begin
+    insert into T_CATEGORIAS_INVENTARIO (
+      nombre
+    )
+    values(p_nombre);
+    return query
+    select 'success', 'Categoria de inventario agregado correctamente.';
+    return;
+
+    exception when others then
+    return query
+    select 'error', 'Error al insertar: ' || sqlerrm;
+    return;
+  end;
+end;
+$$ language plpgsql;
+
+CREATE OR REPLACE function fn_create_productos(
+  p_nombre varchar,
+  p_stock int,
+  p_stock_minimo int,
+  p_precio_decimal decimal,
+  p_categoria_inventario_id int
+)
+returns table(
+  msj_tipo text,
+  msj_texto text
+)
+
+as $$
+begin
+  -- validar campos obligatorios 
+  IF trim(p_nombre) = '' 
+    OR p_porcentar_participacion IS NULL
+    OR p_stock IS NULL
+    OR p_stock_minimo is null
+    or p_precio_decimal is null
+    or p_categoria_inventario_id is null
+    THEN
+  return query
+    select 'warning', 'Debe completar todos los campos';
+  return;
+  end if;
+  begin
+    insert into T_PRODUCTOS
+    (nombre, stock, stock_minimo, precio, categoria_inventario_id)
+
+    values(p_nombre, p_stock, p_stock_minimo, p_precio_decimal, p_categoria_inventario_id);
+    return query
+    select 'success', 'Producto agregado correctamente.';
+    return;
+
+    exception when others then
+    return query
+    select 'error', 'Error al insertar: ' || sqlerrm;
+    return;
+  end;
+end;
+$$ language plpgsql;
+
+
+
+CREATE OR REPLACE function fn_create_categoria_gastos(
+  p_nombre varchar
+)
+returns table(
+  msj_tipo text,
+  msj_texto text
+)
+
+as $$
+begin
+  -- validar campos obligatorios 
+  IF trim(p_nombre) = '' then
+  return query
+    select 'warning', 'Debes completar el nombre.';
+  return;
+  end if;
+  begin
+    insert into T_CATEGORIAS_GASTOS (
+      nombre
+    )
+    values(p_nombre);
+    return query
+    select 'success', 'Categoria de inventario agregado correctamente.';
+    return;
+
+    exception when others then
+    return query
+    select 'error', 'Error al insertar: ' || sqlerrm;
+    return;
+  end;
+end;
+$$ language plpgsql;
+
+
+CREATE OR REPLACE function fn_create_metodos_pago(
+  p_nombre varchar
+)
+returns table(
+  msj_tipo text,
+  msj_texto text
+)
+
+as $$
+begin
+  -- validar campos obligatorios 
+  IF trim(p_nombre) = '' then
+  return query
+    select 'warning', 'Debes completar el nombre.';
+  return;
+  end if;
+  begin
+    insert into T_METODOS_PAGO (
+      nombre
+    )
+    values(p_nombre);
+    return query
+    select 'success', 'Categoria de inventario agregado correctamente.';
+    return;
+
+    exception when others then
+    return query
+    select 'error', 'Error al insertar: ' || sqlerrm;
+    return;
+  end;
+end;
+$$ language plpgsql;
+
+create or replace function fn_create_gastos(
+  p_fecha date,
+  p_descripcion text,
+  p_monto decimal,
+  p_categoria_id int,
+  p_metodo_pago_id int,
+  p_socio_id int
+)
+returns table(
+  msj_texto text,
+  msj_tipo text
+)
+as $$
+begin 
+  --validar campos obligatorios
+  if p_fecha is null OR
+     trim(p_descripcion) = '' OR
+     p_monto is null OR
+     p_categoria_id is null OR
+     p_metodo_pago_id is null OR
+     p_socio_id is null then
+    return query
+      select 'warning', 'Debe completar todos los campos obligatorios';
+    return;
+  end if;
+  begin insert into t_gastos(
+    fecha,
+    descripcion,
+    monto,
+    categoria_id,
+    metodos_pago_id,
+    socio_id
+  )
+  values(
+    p_fecha,
+    p_descripcion,
+    p_monto,
+    p_categoria_id,
+    p_metodo_pago_id,
+    p_socio_id
+  );
+  return query
+  select 'success', 'Gasto agregado correctamente.';
+  return;
+
+  exception when others then
+    return query
+    select 'error', 'Error al insertar: ' || sqlerrm;
+    return;
+  end;  
+end;
+$$ language plpgsql;

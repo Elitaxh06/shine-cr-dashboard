@@ -39,8 +39,8 @@ function EditPartner() {
             <div className="flex flex-col items-center justify-center gap-5">
             <h2 className="text-5xl font-bold">Editar Negocio</h2>
             <p className="text-center font-semibold">Por favor ingrese los siguientes datos</p>
-            </div>
             <FormEditPartner />
+            </div>
         </section>
     )
 }

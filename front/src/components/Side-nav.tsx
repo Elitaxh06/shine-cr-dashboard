@@ -28,16 +28,16 @@ const navItems = [
     href: "/sales",
     icon: DollarSign,
   },
-  // {
-  //   title: "Gastos",
-  //   href: "/dashboard/gastos",
-  //   icon: TrendingDown,
-  // },
-  // {
-  //   title: "Inventario",
-  //   href: "/dashboard/inventario",
-  //   icon: Package,
-  // },
+  {
+    title: "Gastos",
+    href: "/expenses",
+    icon: TrendingDown,
+  },
+  {
+    title: "Inventario",
+    href: "/products",
+    icon: Package,
+  },
   {
     title: "Socios",
     href: "/partners",

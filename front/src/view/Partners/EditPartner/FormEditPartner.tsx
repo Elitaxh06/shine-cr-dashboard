@@ -5,6 +5,28 @@ import { updateTotalPartner } from "../../../service/partners.services"
 import Swal from "sweetalert2"
 import { useSelector } from "react-redux"
 
+const RolesPartners = [
+  { value: 1,
+    name: "Administrador"
+  },
+  {
+    value: 2,
+    name: "Inversionista"
+  },
+  {
+    value: 3,
+    name: "Lavador"
+  },
+  {
+    value: 4,
+    name: "Marketing"
+  },
+  {
+    value: 5,
+    name: "Entidad Empresarial"
+  }
+]
+
 function FormEditPartner(){
     const navigate = useNavigate()
     const [nombre, setNombre ] = useState("")
@@ -166,16 +188,18 @@ function FormEditPartner(){
                 onChange={onchangeGananciaNeta}
                 className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-sky-400"
               />
-              <label className="font-semibold">Rol Id *</label>
-              <input
-                type="number"
+              <label className="font-semibold">Rol *</label>
+              <select
                 name="rol_id"
-                min="2"
-                max="5"
                 value={rol_id}
                 onChange={onchangeRolId}
                 className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-sky-400"
-              />
+              >
+                {RolesPartners.map((role) => (
+                  <option key={role.value} value={role.value}>{role.name}</option>
+                ))}
+              </select>
+
               <label className="font-semibold">Ventas generadas *</label>
               <input
                 type="number"

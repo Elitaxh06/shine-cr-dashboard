@@ -15,6 +15,19 @@ import {
     UpdateTotalSale
 } from '../controller/sale.controller.js'
 
+
+import {
+    createCategoryInventary,
+    createProduct,
+    readProducts
+} from "../controller/inventary.controller.js"
+import { 
+    createMethodPayment,
+    createCategoryExpense,
+    readExpenses,
+    createExpenses
+} from '../controller/expenses.controller.js'
+
 const routes = Router()
 
 
@@ -32,4 +45,18 @@ routes.post("/create-client", createClient)
 routes.post("/create-sale", createSale)
 routes.get("/read-sales", readSales)
 routes.put("/update-sale", UpdateTotalSale)
+
+// ROUTES FOR INVENTARY
+routes.post("/create-category-inventary", createCategoryInventary)
+routes.post("/create-product", createProduct)
+routes.get("/read-products", readProducts)
+
+
+// ROUTES FOR EXPENSES
+routes.post("/create-method-payment", createMethodPayment)
+routes.post("/create-category-expense", createCategoryExpense)
+routes.get("/read-expenses", readExpenses)
+routes.post("/create-expense", createExpenses)
+
+
 export default routes

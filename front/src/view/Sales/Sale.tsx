@@ -17,6 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 
 
 import { Plus, Search, DollarSign, Calendar } from "lucide-react"
+import { Loader1 } from "../../components/loaders/loader1"
 
 
 function Sales(){
@@ -59,9 +60,13 @@ function Sales(){
         getInitialData()
     }, [])
     
-    if(loading){
-        return <div>Cargando...</div>
-    }
+  if (loading) {
+    return (
+      <div className="pt-52">
+        <Loader1 />
+      </div>
+    )
+  }
 
     return (
         <div className="flex flex-col gap-6 p-6">
