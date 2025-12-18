@@ -1,31 +1,36 @@
 import { readSales } from "../../service/sale.services"
 import { useEffect, useState } from "react"
-import type { Sale, ApiResponseSales } from "../../types"
+import type { Sale } from "../../types"
+import Fuse from "fuse.js"
+import { Loader1 } from "../../components/loaders/loader1"
+
+
+
+// importaciones de shadcn
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
-import { Label } from "../../components/ui/label"
 import {
   Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
 } from "../../components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
-
-
 import { Plus, Search, DollarSign, Calendar } from "lucide-react"
-import { Loader1 } from "../../components/loaders/loader1"
+import { Link } from "react-router-dom"
 
 
 function Sales(){
     const [sales, setSales] = useState<Sale[] | null>([])
     // const [salesResponse, setSalesResponse] = useState<ApiResponseSales | null>(null)
     const [loading, setLoading] = useState(true)
-     const [filterService, setFilterService] = useState("all")
-     const [searchTerm, setSearchTerm] = useState("")
+     const [filterService] = useState("all")
+     const [search, setSearch] = useState('')
+     
+     const fuse = new Fuse(sales ?? [], {
+      keys: ["cliente_nombre", "servicio_nombre"],
+      threshold: 0.3,
+     }) 
+
+    const filteredSalesForSearch = search ? fuse.search(search).map((result) => result.item) : sales ?? []
 
     const getInitialData = async () => {
         try{
@@ -43,8 +48,8 @@ function Sales(){
 
     const filteredSales = (sales ?? []).filter((sale) => {
     const matchesSearch =
-    sale.cliente_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sale.servicio_nombre.toLowerCase().includes(searchTerm.toLowerCase());
+    sale.cliente_nombre.toLowerCase().includes(search.toLowerCase()) ||
+    sale.servicio_nombre.toLowerCase().includes(search.toLowerCase());
 
   const matchesService =
     filterService === "all" || sale.servicio_nombre === filterService;
@@ -52,6 +57,8 @@ function Sales(){
   return matchesSearch && matchesService;
 });
 
+    const today = new Date().toISOString().split('T')[0]
+    const salesToday = sales?.filter(sale => sale.fecha === today)
 
     const totalSales = (sales ?? []).reduce((sum, sale) => sum + sale.monto, 0);
 
@@ -75,61 +82,14 @@ function Sales(){
                 <h1 className="text-3xl font-bold tracking-tight">Ventas</h1>
                 <p className="text-muted-foreground">Gestiona y registra las ventas del negocio</p>
               </div>
-                <Dialog >
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Nueva Venta
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Registrar Nueva Venta</DialogTitle>
-              <DialogDescription>Completa los datos del servicio realizado</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="fecha">Fecha</Label>
-                <Input
-                  id="fecha"
-                  type="date"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cliente">Cliente</Label>
-                <Input
-                  id="cliente"
-                  placeholder="Nombre del cliente"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="servicio">Servicio</Label>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="monto">Monto</Label>
-                <Input
-                  id="monto"
-                  type="number"
-                  placeholder="0.00"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="metodoPago">Método de Pago</Label>
-                
-                  
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="socio">Socio Encargado</Label>
-                
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline">
-                Cancelar
+            <Dialog >
+            <Link to="/create-sale">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Nueva Venta
               </Button>
-              <Button >Registrar Venta</Button>
-            </div>
-          </DialogContent>
+            </Link>
+
         </Dialog>
             </div>
 
@@ -165,7 +125,8 @@ function Sales(){
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      ₡{filteredSales.filter((s) => s.fecha === new Date().toISOString().split("T")[0]).length}
+                      {/* ₡{filteredSales.filter((s) => s.fecha === new Date().toISOString().split("T")[0]).length} */}
+                      {salesToday?.length}
                     </div>
                     <p className="text-xs text-muted-foreground">Servicios realizados hoy</p>
                   </CardContent>
@@ -183,8 +144,8 @@ function Sales(){
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar por cliente o servicio..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
                 className="pl-10"
               />
             
@@ -204,14 +165,14 @@ function Sales(){
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredSales.length === 0 ? (
+                {filteredSalesForSearch.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center text-black">
                       No se encontraron ventas
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredSales.map((sale) => (
+                  filteredSalesForSearch.map((sale) => (
                     <TableRow key={sale.venta_id} className="">
                       <TableCell className="w-20">{new Date(sale.fecha).toLocaleDateString()}</TableCell>
                       <TableCell className="font-medium w-20">{sale.cliente_nombre}</TableCell>

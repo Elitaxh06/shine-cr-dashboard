@@ -9,16 +9,24 @@ import { Progress } from "../../components/ui/progress"
 import { readInventary } from "../../service/inventary.services"
 import type { Inventary } from "../../types/invetary.types"
 import { Loader1 } from "../../components/loaders/loader1"
+import Fuse from "fuse.js"
 
 function Inventory() {
     const [products, setProducts] = useState<Inventary[]>([])
     const [loading, setLoading] = useState(true)
-
+    
 
     // filtros por ahora en un futuro se va a usar una libreria
-    const [searchTerm, setSearchTerm] = useState("")
+    const [search, setSearch] = useState("")
     const [filterCategory, setFilterCategory] = useState("all")
     const [filterStock, setFilterStock] = useState("all")
+
+    const fuse = new Fuse(products, {
+      keys: ["nombre", "categoria_nombre"],
+      threshold: 0.3
+    })
+
+    // const filteredProductsForSearch = search ? fuse.search(search).map((result) => result.item) : products
 
 
     const getInitialData = async () => {
@@ -51,8 +59,12 @@ function Inventory() {
     const totalValue = products.reduce((sum, p) => sum + p.stock * p.precio, 0)
 
     // aplicar filtros
-    const filteredProducts = products.filter((item) => {
-      const matchesSearch = item.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredProductsForSearch = products.filter((item) => {
+      
+      const fuseResults = fuse.search(search).map((r) => r.item);
+      const matchesSearch = search === "" || fuseResults.includes(item);
+
+
       const matchesCategory = filterCategory === "all" || item.categoria_nombre === filterCategory
       const matchesStock =
         filterStock === "all" ||
@@ -144,8 +156,8 @@ function Inventory() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar producto..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -193,14 +205,14 @@ function Inventory() {
               </TableHeader>
 
               <TableBody>
-                {filteredProducts.length === 0 ? (
+                {filteredProductsForSearch.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center text-muted-foreground">
                       No se encontraron productos
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredProducts.map((item) => {
+                  filteredProductsForSearch.map((item) => {
                     const stockPercentage = (item.stock / item.stock_minimo) * 100
                     const isLow = item.stock <= item.stock_minimo
 

@@ -35,3 +35,66 @@ export const readSales = async (): Promise<ApiResponseSales | null> => {
     }
 }
 
+export type ObjectSale = {
+    p_fecha : string,
+    p_cliente_id : number,
+    p_servicio_id : number,
+    p_monto : number,
+    p_metodo_pago_id : number,
+    p_socios : number[]
+}
+export const createSale = async ({
+    p_fecha,
+    p_cliente_id,
+    p_servicio_id,
+    p_monto,
+    p_metodo_pago_id,
+    p_socios    
+}: ObjectSale): Promise<ApiResponseSales | null> => {
+    try{
+        const { data } = await axios.post<ApiResponseSales>(
+            import.meta.env.VITE_API_CREATE_SALE_URL,
+            {
+                p_fecha,
+                p_cliente_id,
+                p_servicio_id,
+                p_monto,
+                p_metodo_pago_id,
+                p_socios
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        )
+
+        if(data.resultadoTipo === 'error' || data.resultadoTipo === 'warning'){
+            Swal.fire({
+                icon: "info",
+                title: "Para su informacion",
+                text: data.resultadoTexto
+            })
+            return null
+        }
+        if(data.resultadoTipo === 'success'){
+            Swal.fire({
+                icon: "success",
+                title: "Operacion Exitosa",
+                text: "La venta ha sido creada"
+            })
+            return data
+        }
+
+        return null
+    }catch(error){
+        Swal.fire({
+            icon: "error",
+            title: "Para su informacion",
+            text: "Error al obtener los datos"
+        })
+        return null
+    } 
+
+}
+

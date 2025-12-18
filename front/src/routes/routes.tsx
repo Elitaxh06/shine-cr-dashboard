@@ -4,6 +4,8 @@ import { Sales } from "../view/Sales/Sale"
 import { EditPartner } from "../view/Partners/EditPartner/EditPartner"
 import { Inventory } from "../view/Inventory/Inventory"
 import { Expenses } from "../view/Expenses/Expenses"
+import { CreateSale } from "../view/Sales/CreateSale"
+import { Clients } from "../view/Clients/Clients"
 function RoutesMain() {
     return (
         <Routes>
@@ -13,6 +15,8 @@ function RoutesMain() {
             <Route path="/edit-partner" element={<EditPartner />} />
             <Route path="/products" element={<Inventory />} />
             <Route path="/expenses" element={<Expenses />} />
+            <Route path="/clients" element={<Clients /> } />
+            <Route path="/create-sale" element={<CreateSale /> } />
         </Routes>
     )
 }

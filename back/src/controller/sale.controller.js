@@ -3,10 +3,10 @@ const mensaje = 'Este endpoint devuelve '
 
 export const createSale = async (req, res) => {
     try{
-        const {p_fecha,p_cliente_id,p_servicio_id,p_monto,p_metodo_pago,p_socios} = req.body
+        const {p_fecha,p_cliente_id,p_servicio_id,p_monto,p_metodo_pago_id,p_socios} = req.body
         const { data } = await axios.post(
             process.env.URL_CREATE_SALE,
-            {p_fecha,p_cliente_id,p_servicio_id,p_monto,p_metodo_pago,p_socios},
+            {p_fecha,p_cliente_id,p_servicio_id,p_monto,p_metodo_pago_id,p_socios},
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -113,13 +113,13 @@ export const UpdateTotalSale = async (req, res) => {
             "resultadoTipo" : msj_tipo,
             "resultadoTexto" : msj_texto,
             "datos" : respuesta,
-            "mensaje" : mensaje + ' el socio'
+            "mensaje" : mensaje + ' la venta'
         }
         const mensajeCompletoWarningError = {
             "resultadoTipo" : msj_tipo,
             "resultadoTexto" : msj_texto,
             "datos" : null,
-            "mensaje" : mensaje + ' el socio'
+            "mensaje" : mensaje + ' la venta'
         }
 
         // devolver la respuesta

@@ -18,7 +18,7 @@ export const readExpenses = async (): Promise<apiResponseExpense | null> => {
             Swal.fire({
                 icon: "info",
                 title: "Para su información",
-                text: data.msj_texto
+                text: data.resultadoTexto
             })
         }
         if(data.resultadoTipo === 'success'){

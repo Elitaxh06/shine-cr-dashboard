@@ -43,11 +43,11 @@ const navItems = [
     href: "/partners",
     icon: Users,
   },
-  // {
-  //   title: "Clientes",
-  //   href: "/dashboard/clientes",
-  //   icon: UserCircle,
-  // },
+  {
+    title: "Clientes",
+    href: "/clients",
+    icon: UserCircle,
+  },
   // {
   //   title: "Reportes",
   //   href: "/dashboard/reportes",

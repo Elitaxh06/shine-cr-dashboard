@@ -28,6 +28,12 @@ import {
     createExpenses
 } from '../controller/expenses.controller.js'
 
+
+import {
+    readClients
+} from "../controller/clients.controller.js"
+
+
 const routes = Router()
 
 
@@ -57,6 +63,10 @@ routes.post("/create-method-payment", createMethodPayment)
 routes.post("/create-category-expense", createCategoryExpense)
 routes.get("/read-expenses", readExpenses)
 routes.post("/create-expense", createExpenses)
+
+
+// ROUTES FOR CLIENTS
+routes.get("/read-clients", readClients)
 
 
 export default routes

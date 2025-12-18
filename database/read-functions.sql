@@ -103,7 +103,7 @@ BEGIN
         c.nombre AS cliente_nombre,
         s.nombre AS servicio_nombre,
         v.monto,
-        v.metodo_pago,
+        mp.metodo_pago,
         COALESCE(
           STRING_AGG(so.nombre, ', ' ORDER BY so.nombre),
           'Sin socios'
@@ -119,6 +119,7 @@ BEGIN
         ON vs.venta_id = v.venta_id
       LEFT JOIN t_socios so 
         ON so.socio_id = vs.socio_id
+      left join t_metodos_pago mp on mp.metodos_pago_id = v.metodo_pago
       GROUP BY 
         v.venta_id, 
         v.fecha, 
@@ -157,3 +158,120 @@ END
 $$;
 
 
+CREATE OR REPLACE FUNCTION fn_read_gastos()
+returns table(
+  gastos_id INT,
+  fecha date,
+  descripcion text,
+  monto DECIMAL,
+  categoria_nombre varchar,
+  metodo_pago varchar,
+  socio_nombre varchar,
+  msj_tipo text,
+  msj_texto text
+)
+language plpgsql
+as $$
+begin 
+  if exists (select 1 from T_GASTOS) then 
+    return query 
+      select 
+        g.gastos_id,
+        g.fecha,
+        g.descripcion,
+        g.monto,
+        cg.nombre as categoria_nombre,
+        mp.nombre as metodo_pago,
+        soc.nombre as socio_nombre,
+        'success' as msj_tipo,
+        'Exito al realizar la accion' as msj_texto
+        from t_gastos g
+        left join T_CATEGORIAS_GASTOS cg on cg.categorias_gastos_id = g.categoria_id
+        left join T_METODOS_PAGO mp on mp.metodos_pago_id = g.metodo_pago
+        left join T_SOCIOS soc on soc.socio_id = g.socio_id;
+  else 
+    return query
+      select 
+        NULL::INT,
+        NULL::DATE,
+        NULL::TEXT,
+        NULL::DECIMAL,
+        NULL::VARCHAR,
+        NULL::VARCHAR,
+        NULL::VARCHAR,
+
+        'warning' as msj_tipo,
+        'Actualmente no hay gastos registrados.' as msj_texto;
+  end if;
+
+exception when others then 
+  return query
+    select 
+        NULL::INT,
+        NULL::DATE,
+        NULL::TEXT,
+        NULL::DECIMAL,
+        NULL::VARCHAR,
+        NULL::VARCHAR,
+        NULL::VARCHAR,
+      'error' as msj_tipo,
+      sqlerrm as msj_texto;
+end
+$$;
+
+
+create or replace function fn_read_clientes()
+returns table(
+  nombre varchar,
+  email varchar,
+  telefono varchar,
+  vehiculo varchar,
+  placa varchar,
+  rol_cliente_nombre varchar,
+  msj_tipo text,
+  msj_texto text
+)
+language plpgsql
+as $$
+begin
+  if exists (select 1 from t_clientes) then
+  return query
+  select
+    c.nombre,
+    c.email,
+    c.telefono,
+    c.vehiculo,
+    c.placa,
+    rc.nombre as rol_cliente_nombre,
+    'success' as msj_tipo,
+    'Exito al realizar la accion' as msj_texto
+    from t_clientes c 
+    left join t_roles_clientes rc on rc.roles_clientes_id = c.rol_cliente_id;
+    
+  else
+  return query
+  select 
+    NULL::VARCHAR,
+    NULL::VARCHAR,
+    NULL::VARCHAR,
+    NULL::varchar,
+    NULL::varchar,
+    NULL::varchar,
+    'warning' as msj_tipo,
+    'Actualmente no hay clientes registrados.' as msj_texto;
+  end if;
+  exception when others then
+    return query
+      select 
+        NULL::VARCHAR,
+        NULL::VARCHAR,
+        NULL::VARCHAR,
+        NULL::varchar,
+        NULL::varchar,
+        NULL::varchar,
+        'error' as msj_tipo,
+        sqlerrm as msj_texto; 
+  end
+$$; 
+
+select * from fn_read_clientes()

@@ -2,24 +2,25 @@ import { useEffect, useState } from "react";
 import type { Expense } from "../../types/expenses.types";
 import { readExpenses } from "../../service/expense.services";
 import { Loader1 } from "../../components/loaders/loader1";
+import Fuse from "fuse.js"
 
 // importaciones de shadcn
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
-import { Button } from "../../components/ui/button"
-import { Input } from "../../components/ui/input"
-import { Label } from "../../components/ui/label"
+// import { Button } from "../../components/ui/button"
+// import { Input } from "../../components/ui/input"
+// import { Label } from "../../components/ui/label"
 // import { Textarea } from "../../components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../../components/ui/dialog"
-import { Plus, Search, TrendingDown, Calendar, AlertCircle } from "lucide-react"
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogDescription,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogTrigger,
+// } from "../../components/ui/dialog"
+import {TrendingDown, Calendar, AlertCircle } from "lucide-react"
 import { Badge } from "../../components/ui/badge"
 
 
@@ -28,7 +29,15 @@ function Expenses() {
     const [expenses, setExpenses ] = useState<Expense[]>([])
     const [loading, setLoading] = useState(true)
 
+    const [search, setSearch] = useState('')
 
+    const fuse = new Fuse(expenses, {
+      keys: ["categoria_nombre", "descripcion"],
+      threshold: 0.3,
+    })
+
+    const filteredExpenses = search ? fuse.search(search).map((result) => result.item) : expenses
+    
 
     const getInitialData = async () => {
         try{
@@ -152,6 +161,17 @@ function Expenses() {
       <CardTitle>Historial de Gastos</CardTitle>
       <CardDescription>Listado de todos los gastos registrados</CardDescription>
     </CardHeader>
+    <div className="px-4 pb-4">
+      <input
+        type="text"
+        placeholder="Buscar gasto..."
+        className="border p-2 rounded w-full"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+    </div>
+
+
     <CardContent>
       <div className="rounded-md border">
         <Table>
@@ -166,14 +186,14 @@ function Expenses() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {expenses.length === 0 ? (
+            {filteredExpenses.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center text-muted-foreground">
                   No hay gastos registrados
                 </TableCell>
               </TableRow>
             ) : (
-              expenses.map((expense) => (
+              filteredExpenses.map((expense) => (
                 <TableRow key={expense.gastos_id}>
                   <TableCell>{expense.fecha}</TableCell>
                   <TableCell>
