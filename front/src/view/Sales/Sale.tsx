@@ -16,15 +16,20 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
 import { Plus, Search, DollarSign, Calendar } from "lucide-react"
 import { Link } from "react-router-dom"
+import TrashIcon from "../../components/svg-icons/Trash"
 
 
 function Sales(){
     const [sales, setSales] = useState<Sale[] | null>([])
     // const [salesResponse, setSalesResponse] = useState<ApiResponseSales | null>(null)
     const [loading, setLoading] = useState(true)
-     const [filterService] = useState("all")
-     const [search, setSearch] = useState('')
-     
+    const [filterService] = useState("all")
+    const [search, setSearch] = useState('')
+      
+
+
+
+
      const fuse = new Fuse(sales ?? [], {
       keys: ["cliente_nombre", "servicio_nombre"],
       threshold: 0.3,
@@ -67,12 +72,19 @@ function Sales(){
         getInitialData()
     }, [])
     
+
+
+
   if (loading) {
     return (
       <div className="pt-52">
         <Loader1 />
       </div>
     )
+  }
+
+  const handleDeleteSale = () => {
+      getInitialData()
   }
 
     return (
@@ -83,8 +95,8 @@ function Sales(){
                 <p className="text-muted-foreground">Gestiona y registra las ventas del negocio</p>
               </div>
             <Dialog >
-            <Link to="/create-sale">
-              <Button>
+            <Link to="/dashboard/create-sale" className="cursor-pointer">
+              <Button className="cursor-pointer">
                 <Plus className="mr-2 h-4 w-4" />
                 Nueva Venta
               </Button>
@@ -167,7 +179,7 @@ function Sales(){
               <TableBody>
                 {filteredSalesForSearch.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-black">
+                    <TableCell colSpan={7} className="text-center text-black">
                       No se encontraron ventas
                     </TableCell>
                   </TableRow>
@@ -179,12 +191,14 @@ function Sales(){
                       <TableCell className="w-20">{sale.servicio_nombre}</TableCell>
                       <TableCell className="font-semibold w-20">₡{sale.monto}</TableCell>
                       <TableCell className="w-20">
-                        <button className="p-2 border-2 rounded-md w-16 h-8 flex items-center justify-center text-black cursor-sw-resize">
+                        <button className="p-2 border-2 rounded-md w-20 h-8 flex items-center justify-center text-black">
                             {sale.metodo_pago}
                         </button>
-                        
                       </TableCell>
-                      <TableCell className="flex items-center w-20">{sale.socios_participantes}</TableCell>
+                        <TableCell className="flex items-center w-20">{sale.socios_participantes}</TableCell>
+                        <TableCell className="w-20">
+                            <TrashIcon id={sale.venta_id} onDelete={handleDeleteSale} nameToDelete="sale"/>
+                        </TableCell>
                     </TableRow>
                   ))
                 )}

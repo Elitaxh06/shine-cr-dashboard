@@ -7,14 +7,13 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Legend
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../../components/ui/chart"
 import { useNavigate } from "react-router-dom"
 import { readPartners, readWithIdPartner } from "../../service/partners.services"   // <-- tu función
-import type { ApiResponsePartners, Partner } from "../../types"
+import type { Partner } from "../../types"
 import { Loader1 } from "../../components/loaders/loader1"
 import { useDispatch } from "react-redux"
 import { setPartner } from "../../store"
 
 function Part() {
 
-  const [partnersResponse, setPartnersResponse] = useState<ApiResponsePartners | null>(null)
   const [partners, setPartners] = useState<Partner[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -23,10 +22,8 @@ function Part() {
   const getInitialData = async () => {
     try {
       const data = await readPartners()
-      setPartnersResponse(data)   
-      
+    
       setPartners(data?.datos ?? [])
-
       setLoading(false)
       // const partnerId = data?.datos?.[0]?.socio_id
       
@@ -41,7 +38,7 @@ function Part() {
 
     if(result){
       dispatch(setPartner(result?.datos))
-      navigate('/edit-partner')
+      navigate('/dashboard/edit-partner')
     }
   }
   
@@ -285,9 +282,8 @@ function Part() {
         </CardHeader>
 
         <CardContent>
-          <div className="space-y-4">
-
-            <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+          <div className="space-y-4 ">
+            <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
               <div>
                 <div className="text-sm text-muted-foreground">Total Ventas</div>
                 <div className="text-xl font-bold text-green-600">

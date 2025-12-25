@@ -134,3 +134,54 @@ EXCEPTION WHEN OTHERS THEN
   SELECT 'error', SQLERRM;
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+
+CREATE OR REPLACE FUNCTION fn_update_cliente(
+  p_cliente_id INT,
+  p_nombre varchar,
+  p_email varchar,
+  p_telefono varchar,
+  p_vehiculo varchar,
+  p_placa varchar,
+  p_rol_id INT
+)
+RETURNS TABLE(
+  msj_tipo TEXT,
+  msj_texto TEXT
+)
+AS $$
+BEGIN
+  -- Validaciones
+  IF p_venta_id IS NULL OR p_venta_id <= 0 THEN
+    RETURN QUERY SELECT 'warning', 'Debes enviar un ID de venta válido';
+    RETURN;
+  END IF;
+
+  -- UPDATE de la venta
+  UPDATE t_ventas
+  SET
+    cliente_id = p_cliente_id,
+    servicio_id = p_servicio_id,
+    monto = p_monto,
+    metodo_pago = p_metodo_pago
+  WHERE venta_id = p_venta_id;
+
+  -- Borrar socios anteriores
+  DELETE FROM t_ventas_socios
+  WHERE venta_id = p_venta_id;
+
+  -- Insertar los nuevos socios
+  INSERT INTO t_ventas_socios (venta_id, socio_id)
+  SELECT p_venta_id, unnest(p_socios);
+
+  RETURN QUERY
+  SELECT 'success', 'Venta y socios actualizados correctamente.';
+
+EXCEPTION WHEN OTHERS THEN
+  RETURN QUERY
+  SELECT 'error', SQLERRM;
+END;
+$$ LANGUAGE plpgsql;
+

@@ -95,7 +95,7 @@ function FormEditPartner(){
                 p_gastos_generados: gastos_generados
             })  
             if(result){
-                navigate('/')
+                navigate('/dashboard/partners')
             }
           }            
         }catch(error){

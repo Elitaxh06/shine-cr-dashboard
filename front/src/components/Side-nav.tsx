@@ -1,4 +1,6 @@
 import { Link, useLocation } from "react-router-dom"
+import supabase from "../helper/supabaseClient";
+import { useNavigate } from "react-router-dom";
 
 import { cn } from "../lib/utils"
 import {
@@ -8,44 +10,40 @@ import {
   Package,
   Users,
   UserCircle,
-  BarChart3,
-  Settings,
   Droplets,
-  LogOut,
-  X,
 } from "lucide-react"
 import { Button } from "./ui/button"
 import { ScrollArea } from "./ui/scroll-area"
 
 const navItems = [
-  // {
-  //   title: "Dashboard",
-  //   href: "/dashboard",
-  //   icon: LayoutDashboard,
-  // },
+  {
+    title: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+  },
   {
     title: "Ventas",
-    href: "/sales",
+    href: "/dashboard/sales",
     icon: DollarSign,
   },
   {
     title: "Gastos",
-    href: "/expenses",
+    href: "/dashboard/expenses",
     icon: TrendingDown,
   },
   {
     title: "Inventario",
-    href: "/products",
+    href: "/dashboard/products",
     icon: Package,
   },
   {
     title: "Socios",
-    href: "/partners",
+    href: "/dashboard/partners",
     icon: Users,
   },
   {
     title: "Clientes",
-    href: "/clients",
+    href: "/dashboard/clients",
     icon: UserCircle,
   },
   // {
@@ -67,6 +65,13 @@ interface SidebarNavProps {
 export function SidebarNav({ onClose }: SidebarNavProps) {
     const { pathname } = useLocation()
 
+    const navigate = useNavigate();
+
+    const signOut = async () => {
+        const { error } = await supabase.auth.signOut();
+        // Si NO hay error, la sesión se cerró. Redirige:
+        if (!error) navigate("/");
+    };
 
 
   return (
@@ -88,7 +93,7 @@ export function SidebarNav({ onClose }: SidebarNavProps) {
                 <Button
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    "w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer",
                     isActive && "bg-sidebar-accent text-sidebar-accent-foreground",
                   )}
                   onClick={onClose}
@@ -100,19 +105,12 @@ export function SidebarNav({ onClose }: SidebarNavProps) {
             )
           })}
         </nav>
+        <div className="flex items-start">
+          <button onClick={signOut} className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer mt-5">
+            Cerrar Sesión
+          </button>
+        </div>
       </ScrollArea>
-      <div className="border-t border-sidebar-border p-4">
-        <Link to="/login">
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-            onClick={onClose}
-          >
-            <LogOut className="w-5 h-5" />
-            Cerrar sesión
-          </Button>
-        </Link>
-      </div>
     </div>
   )
 }

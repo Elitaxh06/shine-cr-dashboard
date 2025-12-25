@@ -21,7 +21,6 @@ export const readSales = async (): Promise<ApiResponseSales | null> => {
             })
             return null
         }
-        console.log(data)
         return data
 
     }catch(error){
@@ -96,5 +95,45 @@ export const createSale = async ({
         return null
     } 
 
+}
+
+
+export const deleteSale = async (id: number): Promise<ApiResponseSales | null> => {
+    try{
+        const { data } = await axios.delete<ApiResponseSales>(
+            import.meta.env.VITE_API_DELETE_SALE_URL + id,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        )
+
+        if(data.resultadoTipo === 'error' || data.resultadoTipo === 'warning'){
+            Swal.fire({
+                icon: "info",
+                title: "Para su informacion",
+                text: data.resultadoTexto
+            })
+            return null
+        }
+        if(data.resultadoTipo === 'success'){
+            Swal.fire({
+                icon: "success",
+                title: "Operacion Exitosa",
+                text: "La venta ha sido eliminada"
+            })
+            return data
+        }
+
+        return null
+    }catch(error){
+        Swal.fire({
+            icon: "error",
+            title: "Para su informacion",
+            text: "Error al obtener los datos"
+        })
+        return null
+    }
 }
 

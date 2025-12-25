@@ -190,3 +190,47 @@ export const createExpenses = async (req, res) => {
         return res.status(500).json({message: error.message})
     }
 }
+
+
+export const deleteExpense = async (req, res) => {
+    try{
+        const  p_gasto_id  = req.params.id
+        const { data } = await axios.post(
+            process.env.URL_DELETE_EXPENSE,
+            {p_gasto_id},
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "apikey": process.env.API_KEY,
+                    "Authorization": `Bearer ${process.env.AUTHORIZATOIN}`
+                }
+            }
+        )
+        const result = data
+        // constantes que se repiten
+        const { msj_tipo, msj_texto} = result[0]
+        const respuesta = result
+        const mensajeCompletoSuccess = {
+            "resultadoTipo" : msj_tipo,
+            "resultadoTexto" : msj_texto,
+            "datos" : respuesta,
+            "mensaje" : mensaje + ' el gasto'
+        }
+        const mensajeCompletoWarningError = {
+            "resultadoTipo" : msj_tipo,
+            "resultadoTexto" : msj_texto,
+            "datos" : null,
+            "mensaje" : mensaje + ' el gasto'
+        }
+
+        // devolver la respuesta
+        if(msj_tipo === 'success'){
+            return res.json(mensajeCompletoSuccess)
+        }else if(msj_tipo === 'warning' || msj_tipo === 'error'){
+            return res.json(mensajeCompletoWarningError)
+        }
+        return res.json(result)
+    }catch(error){
+        return res.status(500).json({message: error.message})
+    }
+}

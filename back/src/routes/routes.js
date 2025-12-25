@@ -12,7 +12,8 @@ import {
 import { 
     createSale,
     readSales,
-    UpdateTotalSale
+    UpdateTotalSale,
+    deleteSale
 } from '../controller/sale.controller.js'
 
 
@@ -25,7 +26,8 @@ import {
     createMethodPayment,
     createCategoryExpense,
     readExpenses,
-    createExpenses
+    createExpenses,
+    deleteExpense
 } from '../controller/expenses.controller.js'
 
 
@@ -45,12 +47,14 @@ routes.get("/read-with-id/:id", readWithIdPartner)
 
 // ROUTES FOR CLIENTS
 routes.post("/create-client", createClient)
+routes.get("/read-clients", readClients)
 
 
 // ROUTES FOR SALES
 routes.post("/create-sale", createSale)
 routes.get("/read-sales", readSales)
 routes.put("/update-sale", UpdateTotalSale)
+routes.delete("/delete-sale/:id", deleteSale)
 
 // ROUTES FOR INVENTARY
 routes.post("/create-category-inventary", createCategoryInventary)
@@ -63,10 +67,8 @@ routes.post("/create-method-payment", createMethodPayment)
 routes.post("/create-category-expense", createCategoryExpense)
 routes.get("/read-expenses", readExpenses)
 routes.post("/create-expense", createExpenses)
+routes.delete("/delete-expense/:id", deleteExpense)
 
-
-// ROUTES FOR CLIENTS
-routes.get("/read-clients", readClients)
 
 
 export default routes

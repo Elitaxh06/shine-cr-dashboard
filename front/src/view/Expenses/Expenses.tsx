@@ -3,10 +3,15 @@ import type { Expense } from "../../types/expenses.types";
 import { readExpenses } from "../../service/expense.services";
 import { Loader1 } from "../../components/loaders/loader1";
 import Fuse from "fuse.js"
+import { Link } from "react-router-dom";
+import TrashIcon from "../../components/svg-icons/Trash";
+import supabase from "../../helper/supabaseClient";
+
+
 
 // importaciones de shadcn
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
-// import { Button } from "../../components/ui/button"
+import { Button } from "../../components/ui/button"
 // import { Input } from "../../components/ui/input"
 // import { Label } from "../../components/ui/label"
 // import { Textarea } from "../../components/ui/textarea"
@@ -20,7 +25,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 //   DialogTitle,
 //   DialogTrigger,
 // } from "../../components/ui/dialog"
-import {TrendingDown, Calendar, AlertCircle } from "lucide-react"
+import {TrendingDown, Calendar, AlertCircle, Plus } from "lucide-react"
 import { Badge } from "../../components/ui/badge"
 
 
@@ -28,7 +33,7 @@ import { Badge } from "../../components/ui/badge"
 function Expenses() {
     const [expenses, setExpenses ] = useState<Expense[]>([])
     const [loading, setLoading] = useState(true)
-
+    const [ role, setRole ] = useState<string | null>(null)
     const [search, setSearch] = useState('')
 
     const fuse = new Fuse(expenses, {
@@ -38,7 +43,6 @@ function Expenses() {
 
     const filteredExpenses = search ? fuse.search(search).map((result) => result.item) : expenses
     
-
     const getInitialData = async () => {
         try{
             const data = await readExpenses()
@@ -51,13 +55,9 @@ function Expenses() {
             setLoading(false)
         }
     }
-    useEffect(() => {
-        getInitialData()
-    }, [])
 
-    if(loading){
-        return <div className="pt-52"><Loader1 /></div>
-    }
+
+
 
     // operaciones prar ver los datos
     const totalExpenses = expenses.reduce((sum, expense) => sum + expense.monto, 0)
@@ -77,6 +77,38 @@ function Expenses() {
         return acc
       }, {} as Record<string, Expense[]>)
 
+    useEffect(() => {
+      getInitialData()
+    }, [])
+    useEffect(() => {
+      const fetchRole = async () => { 
+        const { data: { user } } = await supabase.auth.getUser(); 
+        if (!user) return; 
+        const { data: profile } = await supabase 
+          .from("profiles") 
+          .select("role") 
+          .eq("id", user.id) 
+          .single(); 
+          
+        setRole(profile?.role ?? null); 
+      }; 
+        // console.log("Role:", role);
+        fetchRole();
+    }, [])
+      
+    useEffect(() => { console.log("Role actualizado:", role); }, [role]);
+
+
+    if(loading){
+        return <div className="pt-52"><Loader1 /></div>
+    }
+    const handleDeleteExpense = () => {
+        getInitialData()
+    }
+
+    if(role === null){
+        return 
+    }
 
     return (
 <section className="flex flex-col gap-6 p-6">
@@ -87,7 +119,23 @@ function Expenses() {
       <h1 className="text-3xl font-bold tracking-tight">Gastos</h1>
       <p className="text-muted-foreground">Resumen de gastos registrados</p>
     </div>
+    {role === 'employee' ? (
+        <Button disabled className="opacity-50 cursor-not-allowed">
+          <Plus className="mr-2 h-4 w-4" />
+            Nuevo Gasto
+        </Button>
+    ): (
+      <Link to="/dashboard/create-expense">
+        <Button className={`cursor-pointer ${role === "employee" ? "opacity-50 cursor-not-allowed": ""}`} >
+          <Plus className="mr-2 h-4 w-4" />
+          Nuevo Gasto
+          </Button>
+      </Link>
+    )}
   </div>
+
+
+
 
   {/* Stats Cards */}
   <div className="grid gap-4 md:grid-cols-3">
@@ -207,6 +255,14 @@ function Expenses() {
                     <Badge variant="secondary">{expense.metodo_pago}</Badge>
                   </TableCell>
                   <TableCell>{expense.socio_nombre}</TableCell>
+                  <TableCell className="flex items-center w-20">
+                    {role === 'employee' ? (
+                      <TrashIcon id={expense.gastos_id} onDelete={handleDeleteExpense} nameToDelete=""/>
+                    ) : (
+                      <TrashIcon id={expense.gastos_id} onDelete={handleDeleteExpense} nameToDelete="expense"/>
+
+                    )}
+                  </TableCell>
                 </TableRow>
               ))
             )}
