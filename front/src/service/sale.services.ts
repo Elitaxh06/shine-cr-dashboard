@@ -1,12 +1,12 @@
 import Swal from 'sweetalert2';
 import axios from 'axios';
-
+import { saleRoutes } from '../ambientes/ambientes';
 import type { ApiResponseSales } from '../types';
 
 export const readSales = async (): Promise<ApiResponseSales | null> => {
     try{
         const { data } = await axios.get<ApiResponseSales>(
-            import.meta.env.VITE_API_READ_SALES_URL,
+            saleRoutes.read_sales,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ export const createSale = async ({
 }: ObjectSale): Promise<ApiResponseSales | null> => {
     try{
         const { data } = await axios.post<ApiResponseSales>(
-            import.meta.env.VITE_API_CREATE_SALE_URL,
+            saleRoutes.create_sale,
             {
                 p_fecha,
                 p_cliente_id,
@@ -101,7 +101,7 @@ export const createSale = async ({
 export const deleteSale = async (id: number): Promise<ApiResponseSales | null> => {
     try{
         const { data } = await axios.delete<ApiResponseSales>(
-            import.meta.env.VITE_API_DELETE_SALE_URL + id,
+            saleRoutes.delete_sale + id,
             {
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,11 +1,13 @@
 import axios from "axios"
 import type { ApiResponseInventary } from "../types/invetary.types"
 import Swal from "sweetalert2"
+import  { inventoryRoutes } from "../ambientes/ambientes"
+
 
 export const readInventary = async ():Promise<ApiResponseInventary | null> => {
     try{
         const { data } = await axios.get<ApiResponseInventary>(
-            import.meta.env.VITE_API_READ_PRODUCT_INVETARY_URL,
+            inventoryRoutes.read_inventory,
             {
                 headers: {
                     'Content-Type': 'application/json',

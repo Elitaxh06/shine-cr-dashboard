@@ -1,12 +1,13 @@
 import Swal from "sweetalert2";
 import type{ ApiResponseClients } from "../types/clients.types";
 import axios from "axios";
+import { clientRoutes } from "../ambientes/ambientes";
 
 
 export const readClients = async (): Promise<ApiResponseClients | null> => {
     try{
         const { data } = await axios.get(
-            import.meta.env.VITE_API_READ_CLIENTS_URL,
+            clientRoutes.read_clients,
             {
                 headers:{
                     "Content-Type": "application/json",
@@ -56,7 +57,7 @@ export const createClient = async ({
 } : InserClientData): Promise<ApiResponseClients | null> => {
     try{
         const { data } = await axios.post<ApiResponseClients>(
-            import.meta.env.VITE_API_CREATE_CLIENTS_URL,
+            clientRoutes.create_client,
             {
                 p_nombre,
                 p_email,

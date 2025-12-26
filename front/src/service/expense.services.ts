@@ -1,12 +1,13 @@
 import axios from "axios"
 import type { apiResponseExpense } from "../types/expenses.types"
 import Swal from "sweetalert2"
+import { expenseRoutes } from "../ambientes/ambientes"
 
 
 export const readExpenses = async (): Promise<apiResponseExpense | null> => {
     try{
         const { data } = await axios.get(
-            import.meta.env.VITE_API_READ_EXPENSES_URL,
+            expenseRoutes.read_expenses,
             {
                 headers: {
                     "Content-Type": "application/json", 
@@ -56,7 +57,7 @@ export const createExpenses = async ({
 }: ObjectToAddExpense): Promise<apiResponseExpense | null>  => {
     try{
         const { data } = await axios.post(
-            import.meta.env.VITE_API_CREATE_EXPENSES_URL,
+            expenseRoutes.create_expense,
             {
                 p_fecha,
                 p_descripcion,
@@ -100,7 +101,7 @@ export const createExpenses = async ({
 export const deleteExpense = async (id: number): Promise<apiResponseExpense | null> => {
     try{
         const { data } = await axios.delete<apiResponseExpense>(
-            import.meta.env.VITE_API_DELETE_EXPENSE_URL + id,
+            expenseRoutes.delete_expense + id,
             {
                 headers: {
                     "Content-Type": "application/json",

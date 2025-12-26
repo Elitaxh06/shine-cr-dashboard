@@ -1,12 +1,12 @@
 import Swal from 'sweetalert2';
 import axios from 'axios';
-
+import { partnerRoutes } from '../ambientes/ambientes';
 import type { ApiResponsePartners } from '../types';
 
 export const readPartners = async (): Promise<ApiResponsePartners | null>  => {
     try{
         const { data } = await axios.get<ApiResponsePartners>(
-        import.meta.env.VITE_API_READ_PARTNERS_URL,
+        partnerRoutes.read_partners,
         {
             headers: {
                 'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ type UpdateTotalParams = {
 export const updateTotalPartner = async (params: UpdateTotalParams): Promise<ApiResponsePartners | null | undefined> => {
     try{
         const { data } = await axios.put<ApiResponsePartners>(
-            import.meta.env.VITE_API_UPDATE_TOTAL_PARTNERS_URL + params.p_socio_id,
+            partnerRoutes.read_partners + params.p_socio_id,
             {
                 p_socio_id: params.p_socio_id,
                 p_nombre: params.p_nombre,
@@ -104,7 +104,7 @@ export const updateTotalPartner = async (params: UpdateTotalParams): Promise<Api
 export const readWithIdPartner = async(socioId: number):Promise<ApiResponsePartners | null> => {
     try{
         const { data } = await axios.get<ApiResponsePartners>(
-            import.meta.env.VITE_API_READ_WITH_ID_PARTNER + socioId,
+            partnerRoutes.read_partner_by_id + socioId,
             {
                 headers: {
                     'Content-Type': 'application/json',

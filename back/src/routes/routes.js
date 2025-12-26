@@ -43,7 +43,7 @@ const routes = Router()
 routes.get("/read-partners", ReadPartners)
 routes.post("/create-partner", CreatePartner)
 routes.put("/update-partner/:id", UpdateTotalPartner)
-routes.get("/read-with-id/:id", readWithIdPartner)
+routes.get("/read-partner-with-id/:id", readWithIdPartner)
 
 // ROUTES FOR CLIENTS
 routes.post("/create-client", createClient)

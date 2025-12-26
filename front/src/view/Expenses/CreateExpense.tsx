@@ -22,8 +22,8 @@ const metodoList = [
     { id: 2, name: "Sinpe Movil"},
     { id: 3, name: "Transferencia Bancaria"},
     { id: 4, name: "Tarjeta"},
-    { id: 4, name: "Puntos"},
-    { id: 4, name: "Credito"},
+    { id: 5, name: "Puntos"},
+    { id: 6, name: "Credito"},
 ]
 
 const sociosList = [
