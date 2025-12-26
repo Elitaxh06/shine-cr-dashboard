@@ -1,7 +1,7 @@
 let Ambiente = '';
 
-Ambiente = 'dev';
-// Ambiente = 'prod';
+// Ambiente = 'dev';
+Ambiente = 'prod';
 
 let ruta_apis_partners = ''
 let ruta_apis_sales =''
