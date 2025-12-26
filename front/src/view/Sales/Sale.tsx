@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import type { Sale } from "../../types"
 import Fuse from "fuse.js"
 import { Loader1 } from "../../components/loaders/loader1"
-
+import supabase from "../../helper/supabaseClient"
 
 
 // importaciones de shadcn
@@ -25,7 +25,9 @@ function Sales(){
     const [loading, setLoading] = useState(true)
     const [filterService] = useState("all")
     const [search, setSearch] = useState('')
-      
+    const [ role, setRole ] = useState<string | null>(null)    
+
+
 
 
 
@@ -69,12 +71,31 @@ function Sales(){
 
 
     useEffect(() => {
+      const fetchRole = async () => { 
+        const { data: { user } } = await supabase.auth.getUser(); 
+        if (!user) return; 
+        const { data: profile } = await supabase 
+          .from("profiles") 
+          .select("role") 
+          .eq("id", user.id) 
+          .single(); 
+          
+        setRole(profile?.role ?? null); 
+      }; 
+        fetchRole();
+    }, [])
+      
+
+    useEffect(() => {
         getInitialData()
     }, [])
+    if(role === null ){
+        return <div></div>
+    }
+
+
+
     
-
-
-
   if (loading) {
     return (
       <div className="pt-52">
@@ -197,7 +218,11 @@ function Sales(){
                       </TableCell>
                         <TableCell className="flex items-center w-20">{sale.socios_participantes}</TableCell>
                         <TableCell className="w-20">
-                            <TrashIcon id={sale.venta_id} onDelete={handleDeleteSale} nameToDelete="sale"/>
+                            {role === 'employee' ? (
+                              <TrashIcon id={sale.venta_id} onDelete={handleDeleteSale} nameToDelete=""/>
+                            ) : (
+                              <TrashIcon id={sale.venta_id} onDelete={handleDeleteSale} nameToDelete="sale"/>
+                            )}
                         </TableCell>
                     </TableRow>
                   ))

@@ -52,14 +52,14 @@ export default function TrashIcon({id, onDelete, nameToDelete}:{id:number, onDel
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <line y1="5" x2="39" y2="5" stroke="white" stroke-width="4"></line>
+            <line y1="5" x2="39" y2="5" stroke="white" strokeWidth="4"></line>
             <line
               x1="12"
               y1="1.5"
               x2="26.0357"
               y2="1.5"
               stroke="white"
-              stroke-width="3"
+              strokeWidth="3"
             ></line>
           </svg>
           <svg
@@ -78,8 +78,8 @@ export default function TrashIcon({id, onDelete, nameToDelete}:{id:number, onDel
               fill="white"
               mask="url(#path-1-inside-1_8_19)"
             ></path>
-            <path d="M12 6L12 29" stroke="white" stroke-width="4"></path>
-            <path d="M21 6V29" stroke="white" stroke-width="4"></path>
+            <path d="M12 6L12 29" stroke="white" strokeWidth="4"></path>
+            <path d="M21 6V29" stroke="white" strokeWidth="4"></path>
           </svg>
         </button>
     )

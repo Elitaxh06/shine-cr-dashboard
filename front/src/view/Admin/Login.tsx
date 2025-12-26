@@ -11,28 +11,43 @@ export default function Login() {
     const [ showPassword, setShowPassword ] = useState(false)
     
     const handleSubmitLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        setEmail("")
-        setPassword("")
-        setMessage("")
-
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password
-        })
-        if(error){
-            setMessage(error.message)
-            setEmail("")
-            setPassword("")
-            return
-        }
-        if(data){
-            navigate("/dashboard")
-            return null
-        }
-
+      e.preventDefault();
+      setEmail("");
+      setPassword("");
+      setMessage("");
     
-    }
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+  
+      if (error) {
+        setMessage(error.message);
+        setEmail("");
+        setPassword("");
+        return;
+      }
+  
+      if (data?.user) {
+        // Verificar si el perfil existe
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("id", data.user.id)
+          .single();
+    
+        // Si no existe, lo insertamos con rol por defecto
+        if (!profile) {
+          await supabase.from("profiles").insert([
+            { id: data.user.id, role: "employee" },
+          ]);
+        }
+    
+        // Ahora sí navegamos al dashboard
+        navigate("/dashboard");
+      }
+    };
+
     return (
                 <div className="flex flex-col items-center justify-center dark">
             <div className="w-full max-w-md bg-gray-800 rounded-lg shadow-md p-6">

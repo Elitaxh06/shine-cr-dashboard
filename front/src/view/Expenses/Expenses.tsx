@@ -80,6 +80,8 @@ function Expenses() {
     useEffect(() => {
       getInitialData()
     }, [])
+
+
     useEffect(() => {
       const fetchRole = async () => { 
         const { data: { user } } = await supabase.auth.getUser(); 
@@ -92,12 +94,14 @@ function Expenses() {
           
         setRole(profile?.role ?? null); 
       }; 
-        // console.log("Role:", role);
         fetchRole();
     }, [])
       
-    useEffect(() => { console.log("Role actualizado:", role); }, [role]);
 
+
+    if(role === null ){
+        return <div></div>
+    }
 
     if(loading){
         return <div className="pt-52"><Loader1 /></div>
@@ -106,9 +110,6 @@ function Expenses() {
         getInitialData()
     }
 
-    if(role === null){
-        return 
-    }
 
     return (
 <section className="flex flex-col gap-6 p-6">
