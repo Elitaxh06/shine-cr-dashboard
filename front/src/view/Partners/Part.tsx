@@ -6,7 +6,7 @@ import { Progress } from "../../components/ui/progress"
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Legend } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../../components/ui/chart"
 import { useNavigate } from "react-router-dom"
-import { readPartners, readWithIdPartner } from "../../service/partners.services"   // <-- tu función
+import { readPartners, readWithIdPartner } from "../../service/partners.services"  
 import type { Partner } from "../../types"
 import { Loader1 } from "../../components/loaders/loader1"
 import { useDispatch } from "react-redux"

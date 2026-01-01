@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Plus, UserCircle, Star, Mail, Phone, Car, MessageCircle } from "lucide-react"
 import { Badge } from "../../components/ui/badge"
 import { Avatar, AvatarFallback } from "../../components/ui/avatar"
+import TrashIcon from "../../components/svg-icons/Trash";
 
 
 
@@ -82,6 +83,10 @@ function Clients(){
     }, [])
 
     if(loading) return <div className="pt-52"><Loader1 /></div>
+
+    const handleDeleteClient = () => {
+        getInitialData()
+    } 
 
     return (
   <div className="flex flex-col gap-6 p-6">
@@ -278,20 +283,35 @@ function Clients(){
                         <Badge variant={getTipoBadgeVariant(client.rol_cliente_nombre)}>{client.rol_cliente_nombre}</Badge>
                       </TableCell>
                       <TableCell>
+
                         <Button
                           size="sm"
                           variant="outline"
+                          className="cursor-pointer"
                           onClick={() => {
                             const phoneNumber = client.telefono.replace(/[^0-9]/g, "")
                             const message = encodeURIComponent(
-                              `Hola ${client.nombre}, te contactamos desde Sistema Lavacar.`,
+                              `Hola ${client.nombre}, te contactamos desde ShineCR.`,
                             )
                             window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank")
                           }}
                         >
-                          <MessageCircle className="h-4 w-4 mr-1" />
-                          WhatsApp
+                          {client.telefono ? (
+                            <>
+                              <MessageCircle className="h-4 w-4 mr-1" />
+                              WhatsApp
+                            </>
+                          ): (
+                            <div>No hay telefono</div>
+                          )}
                         </Button>
+                      </TableCell>
+                      <TableCell className="w-20">
+                          <TrashIcon 
+                            id={client.client_id}
+                            onDelete={handleDeleteClient}
+                            nameToDelete="client"
+                          />
                       </TableCell>
                     </TableRow>
                   ))

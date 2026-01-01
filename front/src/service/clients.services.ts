@@ -100,3 +100,44 @@ export const createClient = async ({
         return null
     }
 }
+
+
+export const deleteClient = async (id: number): Promise<ApiResponseClients | null> => {
+    try{
+        const { data } = await axios.delete<ApiResponseClients>(
+            clientRoutes.delete_client + id,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            }
+            
+        )
+
+        if(data.resultadoTipo === 'error' || data.resultadoTipo === 'warning'){
+            Swal.fire({
+                icon: "info",
+                title: "Para su información",
+                text: data.resultadoTexto
+            })
+            return null
+        }
+        if(data.resultadoTipo === 'success'){
+            Swal.fire({
+                icon: "success",
+                title: "Operacion Exitosa",
+                text: "El cliente ha sido eliminado"
+            })
+            return data
+        }
+        return null
+    }catch(error: any) {
+        Swal.fire({
+            title: 'Error',
+            text: error.message,
+            icon: 'error',
+            confirmButtonText: 'Aceptar',
+        })
+        return null
+    }
+}

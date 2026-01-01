@@ -93,3 +93,51 @@ export const readClients = async (req, res) => {
         return res.send(error.message);
     }
 }
+
+
+export const deleteClient = async (req, res) => {
+    try{
+        const p_cliente_id  = req.params.id
+        const { data } = await axios.post(
+            process.env.URL_DELETE_CLIENTES,
+            {p_cliente_id},
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "apikey": process.env.API_KEY,
+                    "Authorization": `Bearer ${process.env.AUTHORIZATOIN}`
+                }
+            }
+        )
+
+        const result = data 
+        // constantes que se repiten
+        const { msj_tipo, msj_texto} = result[0]
+        const respuesta = result
+        const mensajeCompletoSuccess = {
+            "resultadoTipo" : msj_tipo,
+            "resultadoTexto" : msj_texto,
+            "datos" : respuesta,
+            "mensaje" : mensaje + ' el cliente'
+        }
+        const mensajeCompletoWarningError = {
+            "resultadoTipo" : msj_tipo,
+            "resultadoTexto" : msj_texto,
+            "datos" : null,
+            "mensaje" : mensaje + ' el cliente'
+        }
+
+        // devolver la respuesta
+        if(msj_tipo === 'success'){
+            return res.json(mensajeCompletoSuccess)
+        }else if(msj_tipo === 'warning' || msj_tipo === 'error'){
+            return res.json(mensajeCompletoWarningError)
+        }
+
+        return res.json(result)
+
+    }catch(error){
+        console.error("Error en deleteClient:", error); 
+        return res.status(500).json({ mensaje: error.message });    
+    }
+}

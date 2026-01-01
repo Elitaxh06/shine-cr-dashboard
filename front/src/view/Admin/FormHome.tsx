@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom";
 
-
-
 export default function FormHome() {
   return (
     <section className="flex items-center flex-col gap-12"  >
@@ -18,6 +16,7 @@ export default function FormHome() {
                 Iniciar Sesion
               </button>
             </Link>
+
         </div>
     </section>
   );

@@ -1,7 +1,7 @@
 let Ambiente = '';
 
-// Ambiente = 'dev';
-Ambiente = 'prod';
+Ambiente = 'dev';
+// Ambiente = 'prod';
 
 let ruta_apis_partners = ''
 let ruta_apis_sales =''
@@ -68,5 +68,6 @@ export const inventoryRoutes = {
 
 export const clientRoutes = {
     read_clients: ruta_apis_clients + import.meta.env.VITE_API_GET_CLIENTS,
-    create_client: ruta_apis_clients + import.meta.env.VITE_API_CREATE_CLIENT
+    create_client: ruta_apis_clients + import.meta.env.VITE_API_CREATE_CLIENTS,
+    delete_client: ruta_apis_clients + import.meta.env.VITE_API_DELETE_CLIENTS
 }

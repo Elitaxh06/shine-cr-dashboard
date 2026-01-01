@@ -88,6 +88,7 @@ function CreateClient() {
                       className="bg-gray-700 text-gray-200 border-0 rounded-md p-2"
                       id="nombre"
                       type="text"
+                      required
                     />
 
                     <label className="text-sm mb-2 text-gray-200 cursor-pointer" htmlFor="email">
@@ -100,7 +101,6 @@ function CreateClient() {
                       className="bg-gray-700 text-gray-200 border-0 rounded-md p-2"
                       id="email"
                       type="mail"
-                      required
                     />
                     
 
@@ -126,6 +126,7 @@ function CreateClient() {
                       className="bg-gray-700 text-gray-200 border-0 rounded-md p-2"
                       id="vehiculo"
                       type="text"
+                      required
                     />
 
 
@@ -154,6 +155,7 @@ function CreateClient() {
 
                         className="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1     focus:ring-blue-500 transition ease-in-out  duration-150"
                         id="venta"
+                        required
                     >
                     <option value={0}>Escoja un rol del cliente</option>
                     {clientRolList.map((rol) => (

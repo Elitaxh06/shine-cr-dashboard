@@ -30,6 +30,7 @@ function HomeData() {
     const [sales, setSales] = useState<Sale[]>([]); 
     const [expenses, setExpenses] = useState<Expense[]>([]); 
     const [socios, setSocios ] = useState<Partner[]>([]);
+
     useEffect(() => { 
         const fetchData = async () => 
             { const salesData = await readSales(); 

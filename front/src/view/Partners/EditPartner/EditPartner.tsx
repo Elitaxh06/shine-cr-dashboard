@@ -12,7 +12,7 @@ function EditPartner() {
             <button
               className="bg-white text-center w-36 pl-3 rounded-2xl h-12 relative text-black text-xl font-semibold group cursor-pointer ml-8"
               type="button"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/dashboard/partners')}
             >
               <div
                 className="bg-green-400 rounded-xl h-10 w-1/4 flex items-center justify-center absolute left-1 top-1 group-hover:w-[138px] z-10 duration-500"

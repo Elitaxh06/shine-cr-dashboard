@@ -18,7 +18,7 @@ export function getTotalSalesThisMonth(sales: Sale[]): number {
   return salesThisMonth.reduce((sum, sale) => sum + sale.monto, 0);
 }
 
-// 👉 clientes únicos
+// clientes únicos
 
 export function logUniqueClientsThisMonth(sales: Sale[]): string[] {
 
@@ -34,7 +34,7 @@ export function logUniqueClientsThisMonth(sales: Sale[]): string[] {
       );
     });
 
-    // 👉 clientes únicos por nombre
+    // clientes únicos por nombre
     const clientesUnicos = Array.from(
       new Set(salesThisMonth.map(sale => sale.cliente_nombre))
     );

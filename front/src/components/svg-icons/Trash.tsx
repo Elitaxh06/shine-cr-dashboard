@@ -1,13 +1,22 @@
 import { deleteSale } from "../../service/sale.services"
 import { deleteExpense } from "../../service/expense.services"
+import { deleteClient } from "../../service/clients.services"
+
+
 import Swal from "sweetalert2"
-
-
 import "./trash.css"
 
 export default function TrashIcon({id, onDelete, nameToDelete}:{id:number, onDelete:() => void, nameToDelete: string}) {
 
-    const message = nameToDelete === 'sale' ? "La venta ha sido eliminada" : "El gasto ha sido eliminado"
+    let message: string
+
+    if(nameToDelete === 'client'){
+        message = "El cliente ha sido eliminado"
+    }else if(nameToDelete === 'sale'){
+        message = "La venta ha sido eliminada"
+    }else if(nameToDelete === 'expense'){
+        message = "El gasto ha sido eliminado"
+    }
   
     const handleDeleteSale = async (id:number) => {
         try{    
@@ -18,6 +27,9 @@ export default function TrashIcon({id, onDelete, nameToDelete}:{id:number, onDel
               break
             case "expense":
                result = await deleteExpense(id)
+              break
+            case "client":
+              result = await deleteClient(id)
               break
             default:
               break

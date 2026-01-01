@@ -5,9 +5,6 @@ import {
     UpdateTotalPartner,
     readWithIdPartner
 } from '../controller/partners.controller.js'
-import {
-    createClient
-} from '../controller/clients.controller.js'
 
 import { 
     createSale,
@@ -32,7 +29,10 @@ import {
 
 
 import {
-    readClients
+    readClients,
+    createClient,
+    deleteClient
+
 } from "../controller/clients.controller.js"
 
 
@@ -48,7 +48,7 @@ routes.get("/read-partner-with-id/:id", readWithIdPartner)
 // ROUTES FOR CLIENTS
 routes.post("/create-client", createClient)
 routes.get("/read-clients", readClients)
-
+routes.delete("/delete-client/:id", deleteClient)
 
 // ROUTES FOR SALES
 routes.post("/create-sale", createSale)

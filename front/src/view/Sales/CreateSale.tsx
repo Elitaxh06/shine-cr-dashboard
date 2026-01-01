@@ -1,9 +1,9 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { readClients } from "../../service/clients.services";
 import { createSale } from "../../service/sale.services";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-
+import type { Client } from "../../types/clients.types";
 
 const partnersList = [
     { id: 4, name: "Esteban"},
@@ -26,11 +26,6 @@ const serviciosList = [
     {id:3, name: "Premium"},
 ]
 
-const clietesList = [
-    { id: 1, name: "Grettel"},
-    { id: 2, name: "Eduardo"},
-]
-
 const priceSaleList = [
     { id: 1, name: "Básico", price: 7000},
     { id: 2, name: "Completo", price: 10000},
@@ -38,7 +33,10 @@ const priceSaleList = [
 ]
 
 
+
+
 function CreateSale(){
+
     const navigate = useNavigate()
     const [fecha, setFecha] = useState<string>("")
     const [cliente_id, setCliente_id] = useState<number>(0)
@@ -46,7 +44,20 @@ function CreateSale(){
     const [monto, setMonto] = useState<number>(0)
     const [metodo_pago_id, setMetodo_pago_id] = useState<number>(0)
     const [socios, setSocios] = useState<number[]>([])
+    const [clients, setClients] = useState<Client[]>([])
 
+    const getClients = async () => {
+        try {
+            const data = await readClients()
+            setClients(data?.datos ?? [])
+        }catch(error){
+            return null
+        }
+    }
+    
+    useEffect(() => {
+        getClients()
+    }, [])
 
     const insertSaleHandler = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -164,7 +175,7 @@ function CreateSale(){
                 <select
                     value={metodo_pago_id}
                     onChange={(e) => setMetodo_pago_id(Number(e.target.value))}
-                  className="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1focus:ring-blue-500    transition ease-in-out duration-150"
+                  className="bg-gray-700 text-gray-200 border-0 rounded-md p-2 mb-4 focus:bg-gray-600 focus:outline-none focus:ring-1focus:ring-blue-500 transition ease-in-out duration-150"
                   id="pago"
                 >
                   <option value={0}>Escoja un metodo de pago</option>
@@ -209,8 +220,8 @@ function CreateSale(){
                   id="cliente"
                 >
                   <option value={0}>Escoja un cliente</option>
-                  {clietesList.map((cli) => (
-                      <option value={cli.id} key={cli.id}>{cli.name}</option>
+                  {clients.map((cli) => (
+                      <option value={cli.client_id} key={cli.client_id}>{cli.nombre}</option>
                   ))}
                 </select>
               

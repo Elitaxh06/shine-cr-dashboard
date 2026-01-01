@@ -114,3 +114,42 @@ EXCEPTION WHEN OTHERS THEN
       'Ocurrió un error al intentar eliminar la venta: ' || sqlerrm;
 END
 $$;
+
+
+
+
+CREATE OR REPLACE FUNCTION fn_delete_cliente(
+  p_cliente_id INT
+)
+RETURNS TABLE(
+  msj_tipo TEXT,
+  msj_texto TEXT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  -- Validar que el cliente exista
+  IF NOT EXISTS (SELECT 1 FROM t_clientes WHERE cliente_id = p_cliente_id) THEN
+    RETURN QUERY
+      SELECT 
+        'warning'::TEXT,
+        'No se encontró el cliente con ID ' || p_cliente_id;
+    RETURN;
+  END IF;
+
+  -- Eliminar el cliente
+  DELETE FROM t_clientes
+  WHERE cliente_id = p_cliente_id;
+
+  RETURN QUERY
+    SELECT 
+      'success'::TEXT,
+      'El cliente con ID ' || p_cliente_id || ' fue eliminado exitosamente.';
+
+EXCEPTION WHEN OTHERS THEN
+  RETURN QUERY
+    SELECT 
+      'error'::TEXT,
+      'Ocurrió un error al intentar eliminar el cliente: ' || sqlerrm;
+END
+$$;

@@ -27,11 +27,6 @@ function Sales(){
     const [search, setSearch] = useState('')
     const [ role, setRole ] = useState<string | null>(null)    
 
-
-
-
-
-
      const fuse = new Fuse(sales ?? [], {
       keys: ["cliente_nombre", "servicio_nombre"],
       threshold: 0.3,
