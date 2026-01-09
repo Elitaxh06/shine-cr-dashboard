@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
+import { Button } from "../../components/ui/button"
+import { Plus } from "lucide-react"
 import { Input } from "../../components/ui/input"
+import { Dialog } from "@radix-ui/react-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table"
 import { Search, Package, AlertTriangle, TrendingUp } from "lucide-react"
@@ -9,6 +12,7 @@ import { Progress } from "../../components/ui/progress"
 import { readInventary } from "../../service/inventary.services"
 import type { Inventary } from "../../types/invetary.types"
 import { Loader1 } from "../../components/loaders/loader1"
+import { Link } from "react-router-dom"
 import Fuse from "fuse.js"
 
 function Inventory() {
@@ -78,9 +82,19 @@ function Inventory() {
     <div className="flex flex-col gap-6 p-6">
 
       {/* HEADER */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Inventario</h1>
-        <p className="text-muted-foreground">Los productos del lavacar</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Inventario</h1>
+          <p className="text-muted-foreground">Los productos del lavacar</p>
+        </div>
+        <Dialog>
+          <Link to="/dashboard/create-product" className="cursor-pointer">
+            <Button className="cursor-pointer">
+              <Plus className="mr-2 h-4 w-4" />
+              Nueva Venta
+            </Button>
+          </Link>
+        </Dialog>
       </div>
 
       {/* STATS */}

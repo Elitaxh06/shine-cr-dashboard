@@ -50,7 +50,7 @@ export const createCategoryInventary = async (req, res) => {
 
 export const createProduct = async (req, res) => {
     try{
-        const { p_nombre,p_stock,p_stock_minimo,p_precio_decimal,p_categoria_inventario_id} = req.body
+        const { p_nombre,p_stock,p_stock_minimo,p_precio_decimal,p_categoria_inventario_id } = req.body
         const { data } = await axios.post(
             process.env.URL_CREATE_PRODUCTS,
             {p_nombre,p_stock,p_stock_minimo,p_precio_decimal,p_categoria_inventario_id},

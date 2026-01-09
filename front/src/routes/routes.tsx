@@ -12,6 +12,7 @@ import { Home } from "../view/Home";
 import Register from "../view/Admin/Register";
 import Login from "../view/Admin/Login";
 import FormHome from "../view/Admin/FormHome";
+import { CreateProduct } from "../view/Inventory/CreateProduct";
 
 import AuthGuard from "../view/Admin/AuthGuard";
 import DashboardLayout from "../view/DashboardLayout";
@@ -19,6 +20,7 @@ import DashboardLayout from "../view/DashboardLayout";
 function RoutesMain() {
   return (
     <Routes>
+
       <Route path="/" element={<FormHome />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
@@ -37,8 +39,10 @@ function RoutesMain() {
           <Route path="create-sale" element={<CreateSale />} />
           <Route path="create-client" element={<CreateClient />} />
           <Route path="create-expense" element={<CreateExpense />} />
+          <Route path="create-product" element={<CreateProduct /> } />
         </Route>
       </Route>
+
     </Routes>
   );
 }

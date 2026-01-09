@@ -35,7 +35,7 @@ function FormEditPartner(){
     const [telefono, setTelefono ] = useState("")
     const [inversion_inicial, setInversionInicial ] = useState(1)
     const [ganancia_neta, setGananciaNeta ] = useState(1)
-    const [rol_id, setRolId ] = useState(2)
+    const [rol_id, setRolId ] = useState(1)
     const [ventas_generadas, setVentasGeneradas ] = useState(1)
     const [gastos_generados, setGastosGenerados ] = useState(1)
 
@@ -116,7 +116,7 @@ function FormEditPartner(){
             setInversionInicial(partnerForEdit.inversion_inicial)
             setGananciaNeta(partnerForEdit.ganancia_neta)
             // convert to number and fallback to current state default (2) when missing
-            setRolId(Number(partnerForEdit.rol_id ?? 2))
+            setRolId(Number(partnerForEdit.rol_id ?? 1))
             setVentasGeneradas(partnerForEdit.ventas_generadas)
             setGastosGenerados(partnerForEdit.gastos_generados)
         }
@@ -164,7 +164,7 @@ function FormEditPartner(){
 
               <label className="font-semibold">Teléfono *</label>
               <input
-                type="number"
+                type="text"
                 name="telefono"
                 value={telefono}
                 onChange={onchangeTelefono}

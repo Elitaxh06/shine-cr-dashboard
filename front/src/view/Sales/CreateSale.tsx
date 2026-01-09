@@ -16,8 +16,8 @@ const methodPayList = [
     { id: 2, name: "Sinpe Movil"},
     { id: 3, name: "Transferencia Bancaria"},
     { id: 4, name: "Tarjeta"},
-    { id: 4, name: "Puntos"},
-    { id: 4, name: "Credito"},
+    { id: 5, name: "Puntos"},
+    { id: 6, name: "Credito"},
 ]
 
 const serviciosList = [
@@ -27,7 +27,7 @@ const serviciosList = [
 ]
 
 const priceSaleList = [
-    { id: 1, name: "Básico", price: 7000},
+    { id: 1, name: "Básico", price: 6000},
     { id: 2, name: "Completo", price: 10000},
     { id: 3, name: "Premium", price: 15000},
 ]

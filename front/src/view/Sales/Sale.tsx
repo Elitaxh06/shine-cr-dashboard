@@ -110,15 +110,14 @@ function Sales(){
                 <h1 className="text-3xl font-bold tracking-tight">Ventas</h1>
                 <p className="text-muted-foreground">Gestiona y registra las ventas del negocio</p>
               </div>
-            <Dialog >
-            <Link to="/dashboard/create-sale" className="cursor-pointer">
-              <Button className="cursor-pointer">
-                <Plus className="mr-2 h-4 w-4" />
-                Nueva Venta
-              </Button>
-            </Link>
-
-        </Dialog>
+              <Dialog >
+                <Link to="/dashboard/create-sale" className="cursor-pointer">
+                  <Button className="cursor-pointer">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Nueva Venta
+                  </Button>
+                </Link>
+              </Dialog>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
