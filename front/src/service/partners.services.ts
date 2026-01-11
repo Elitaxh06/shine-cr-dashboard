@@ -53,7 +53,7 @@ type UpdateTotalParams = {
 export const updateTotalPartner = async (params: UpdateTotalParams): Promise<ApiResponsePartners | null | undefined> => {
     try{
         const { data } = await axios.put<ApiResponsePartners>(
-            partnerRoutes.read_partners + params.p_socio_id,
+            partnerRoutes.update_partner+ params.p_socio_id,
             {
                 p_socio_id: params.p_socio_id,
                 p_nombre: params.p_nombre,
@@ -93,7 +93,7 @@ export const updateTotalPartner = async (params: UpdateTotalParams): Promise<Api
         Swal.fire({
             icon: "error",
             title: "Para su informacion",
-            text: "Error al obtener los datos"
+            text: "Error al actualizar los datos"
         })
         console.log('Error al obtener los datos', error)
         return null

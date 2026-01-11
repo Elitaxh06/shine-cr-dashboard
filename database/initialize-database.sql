@@ -36,6 +36,28 @@ CREATE TABLE T_CLIENTES(
   rol_cliente_id INT references t_roles_clientes(roles_clientes_id) on delete set null
 )
 
+INSERT INTO t_clientes (cliente_id, nombre, email, telefono, vehiculo, placa, rol_cliente_id)
+VALUES (0, 'Cliente eliminado', NULL, NULL, NULL, NULL, 4);
+
+
+
+
+ALTER TABLE t_ventas
+DROP CONSTRAINT t_ventas_cliente_id_fkey,
+ADD CONSTRAINT t_ventas_cliente_id_fkey
+FOREIGN KEY (cliente_id)
+REFERENCES t_clientes(cliente_id)
+ON DELETE SET DEFAULT;
+
+ALTER TABLE t_ventas ALTER COLUMN cliente_id SET DEFAULT 0;
+
+
+ALTER TABLE t_clientes
+ALTER COLUMN email DROP NOT NULL,
+ALTER COLUMN telefono DROP NOT NULL,
+ALTER COLUMN placa DROP NOT NULL;
+
+
 
 CREATE TABLE T_SERVICIOS(
   servicio_id SERIAL PRIMARY KEY,
@@ -50,11 +72,56 @@ CREATE TABLE T_VENTAS(
   cliente_id INT REFERENCES t_clientes(cliente_id),
   servicio_id INT REFERENCES t_servicios(servicio_id),
   monto DECIMAL(10,2) NOT NULL,
-  metodo_pago VARCHAR(50) NOT NULL
 )
+ALTER TABLE t_ventas
+ADD COLUMN metodo_pago_id INT;
+ALTER TABLE t_ventas
+ADD CONSTRAINT fk_ventas_metodo_pago
+FOREIGN KEY (metodo_pago_id)
+REFERENCES t_metodos_pago(metodos_pago_id);
+
+
+
 
 CREATE TABLE T_VENTAS_SOCIOS(
   venta_id INT REFERENCES t_ventas(venta_id),
   socio_id INT REFERENCES t_socios(socio_id),
   PRIMARY KEY (venta_id, socio_id)
+)
+
+
+CREATE TABLE T_CATEGORIAS_INVENTARIO (
+  categorias_invetario_id SERIAL PRIMARY KEY,
+  nombre VARCHAR(200) NOT NULL
+);
+
+
+CREATE TABLE T_PRODUCTOS(
+  productos_id serial primary key,
+  nombre varchar(200) not null,
+  stock int not null,
+  stock_minimo int default 0,
+  precio decimal(10,2) not null,
+  categoria_id INT REFERENCES T_CATEGORIAS_INVENTARIO(categorias_invetario_id)
+)
+
+create table T_METODOS_PAGO(
+  metodos_pago_id serial primary key,
+  nombre varchar(200) not null
+)
+
+create table T_CATEGORIAS_GASTOS(
+  categorias_gastos_id serial primary key,
+  nombre varchar(200) not null
+)
+
+
+CREATE TABLE T_GASTOS(
+  gastos_id serial primary key,
+  fecha date not null,
+  descripcion text not null,
+  monto decimal(10,2) not null,
+  categoria_id int not null references t_categorias_gastos(categorias_gastos_id),
+  metodo_pago int not null references t_metodos_pago(metodos_pago_id),
+  socio_id int references t_socios(socio_id)
 )

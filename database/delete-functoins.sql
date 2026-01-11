@@ -1,3 +1,4 @@
+
 CREATE OR REPLACE FUNCTION fn_delete_venta(
   p_venta_id INT
 )
@@ -62,6 +63,12 @@ EXCEPTION WHEN OTHERS THEN
 END
 $$;
 
+select * from fn_delete_venta(25)
+
+select * from t_ventas
+
+UPDATE t_socios SET ventas_generadas = 0;
+
 
 
 CREATE OR REPLACE FUNCTION fn_delete_gasto(
@@ -87,8 +94,8 @@ BEGIN
   END IF;
 
   -- Obtener monto y socios del gasto
-  SELECT monto INTO v_monto
-  into v_monto, v_socio_id
+  SELECT monto, socio_id
+  INTO v_monto, v_socio_id
   FROM t_gastos
   WHERE gastos_id = p_gasto_id;
 
@@ -115,6 +122,9 @@ EXCEPTION WHEN OTHERS THEN
 END
 $$;
 
+select * from fn_delete_gasto(14)
+select * from t_gastos
+
 
 
 
@@ -131,25 +141,19 @@ BEGIN
   -- Validar que el cliente exista
   IF NOT EXISTS (SELECT 1 FROM t_clientes WHERE cliente_id = p_cliente_id) THEN
     RETURN QUERY
-      SELECT 
-        'warning'::TEXT,
-        'No se encontró el cliente con ID ' || p_cliente_id;
+      SELECT 'warning', 'No se encontró el cliente con ID ' || p_cliente_id;
     RETURN;
   END IF;
 
-  -- Eliminar el cliente
+  -- Eliminar el cliente (las ventas quedan con cliente_id = NULL)
   DELETE FROM t_clientes
   WHERE cliente_id = p_cliente_id;
 
   RETURN QUERY
-    SELECT 
-      'success'::TEXT,
-      'El cliente con ID ' || p_cliente_id || ' fue eliminado exitosamente.';
+    SELECT 'success', 'El cliente con ID ' || p_cliente_id || ' fue eliminado exitosamente.';
 
 EXCEPTION WHEN OTHERS THEN
   RETURN QUERY
-    SELECT 
-      'error'::TEXT,
-      'Ocurrió un error al intentar eliminar el cliente: ' || sqlerrm;
+    SELECT 'error', 'Ocurrió un error al intentar eliminar el cliente: ' || sqlerrm;
 END
 $$;

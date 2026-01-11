@@ -1,4 +1,4 @@
--- DROP FUNCTION fn_read_with_id_partners(integer)
+
 CREATE OR REPLACE FUNCTION fn_read_with_id_partners(
     p_socio_id INT
 )
@@ -51,7 +51,6 @@ BEGIN
       LEFT JOIN t_roles_socios r
         ON r.roles_socios_id = t.rol_id
       WHERE t.socio_id = p_socio_id;  -- calificado
-
   ELSE
     RETURN QUERY
     SELECT
@@ -71,7 +70,3 @@ EXCEPTION
       'error'::text, 'Error inesperado: ' || SQLERRM;
 END
 $$;
-
-
--- SELECT * FROM fn_read_with_id_partners(6);
--- select * from t_socios

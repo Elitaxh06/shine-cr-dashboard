@@ -1,17 +1,3 @@
-DROP FUNCTION fn_create_partners(
-  character varying,
-  numeric,
-  character varying,
-  character varying,
-  numeric,
-  numeric,
-  integer,
-  integer,
-  integer
-);
-
-select * from t_roles_socios
-
 CREATE OR REPLACE function fn_create_partners(
   p_nombre varchar,
   p_porcentar_participacion decimal,
@@ -119,12 +105,15 @@ SELECT * FROM t_ventas
 
 select * from fn_read_ventas
 
+DROP FUNCTION fn_create_venta(date,integer,integer,numeric,integer,integer[])
+
+
 CREATE OR REPLACE FUNCTION fn_create_venta(
   p_fecha DATE,
   p_cliente_id INT,
   p_servicio_id INT,
   p_monto DECIMAL,
-  p_metodo_pago VARCHAR,
+  p_metodo_pago_id int,
   p_socios INT[]    
 )
 RETURNS TABLE(
@@ -143,7 +132,7 @@ BEGIN
      OR p_cliente_id IS NULL
      OR p_servicio_id IS NULL
      OR p_monto IS NULL
-     OR p_metodo_pago IS NULL THEN
+     OR p_metodo_pago_id IS NULL THEN
     RETURN QUERY
       SELECT 'warning', 'Debe completar todos los campos obligatorios';
     RETURN;
@@ -162,6 +151,12 @@ BEGIN
       SELECT 'warning', 'El servicio seleccionado no existe';
     RETURN;
   END IF;
+
+  IF NOT exists(select 1 from t_metodos_pago where metodos_pago_id = p_metodo_pago_id) then
+    return query
+      select 'warning', 'El metodo de pago seleccionado no existe'
+    return;
+  end if;
 
   -- Validar socios participantes
   IF p_socios IS NULL OR array_length(p_socios, 1) = 0 THEN
@@ -182,14 +177,14 @@ BEGIN
     cliente_id,
     servicio_id,
     monto,
-    metodo_pago
+    metodo_pago_id
   )
   VALUES(
     p_fecha,
     p_cliente_id,
     p_servicio_id,
     p_monto,
-    p_metodo_pago
+    p_metodo_pago_id
   )
   RETURNING venta_id INTO v_venta_id;
 
@@ -212,6 +207,13 @@ END
 $$;
 
 
+
+
+SELECT tgname, tgrelid::regclass
+FROM pg_trigger
+WHERE tgrelid = 't_ventas'::regclass;
+
+
 CREATE OR REPLACE FUNCTION fn_create_cliente(
   p_nombre VARCHAR,
   p_email VARCHAR,
@@ -231,18 +233,6 @@ BEGIN
   IF trim(p_nombre) = '' THEN
     RETURN QUERY
       SELECT 'warning', 'Debe ingresar el nombre del cliente';
-    RETURN;
-  END IF;
-
-  IF trim(p_email) = '' THEN
-    RETURN QUERY
-      SELECT 'warning', 'Debe ingresar el email del cliente';
-    RETURN;
-  END IF;
-
-  IF trim(p_telefono) = '' THEN
-    RETURN QUERY
-      SELECT 'warning', 'Debe ingresar el teléfono del cliente';
     RETURN;
   END IF;
 
@@ -368,7 +358,7 @@ EXCEPTION WHEN OTHERS THEN
 END
 $$;
 
-SELECT * FROM fn_create_role_client('VIP')
+SELECT * FROM fn_create_role_client('Genérico')
 
 
 CREATE OR REPLACE function fn_create_categoria_inventario(
@@ -420,7 +410,6 @@ as $$
 begin
   -- validar campos obligatorios 
   IF trim(p_nombre) = '' 
-    OR p_porcentar_participacion IS NULL
     OR p_stock IS NULL
     OR p_stock_minimo is null
     or p_precio_decimal is null
@@ -432,7 +421,7 @@ begin
   end if;
   begin
     insert into T_PRODUCTOS
-    (nombre, stock, stock_minimo, precio, categoria_inventario_id)
+    (nombre, stock, stock_minimo, precio, categoria_id)
 
     values(p_nombre, p_stock, p_stock_minimo, p_precio_decimal, p_categoria_inventario_id);
     return query
@@ -447,6 +436,8 @@ begin
 end;
 $$ language plpgsql;
 
+select * from t_categorias_inventario
+select * from t_clientes
 
 
 CREATE OR REPLACE function fn_create_categoria_gastos(
@@ -516,40 +507,56 @@ begin
 end;
 $$ language plpgsql;
 
-create or replace function fn_create_gastos(
-  p_fecha date,
-  p_descripcion text,
-  p_monto decimal,
-  p_categoria_id int,
-  p_metodo_pago_id int,
-  p_socio_id int
+
+CREATE OR REPLACE FUNCTION fn_create_gastos(
+  p_fecha DATE,
+  p_descripcion TEXT,
+  p_monto DECIMAL,
+  p_categoria_id INT,
+  p_metodo_pago_id INT,
+  p_socio_id INT
 )
-returns table(
-  msj_texto text,
-  msj_tipo text
+RETURNS TABLE(
+  msj_texto TEXT,
+  msj_tipo TEXT
 )
-as $$
-begin 
-  --validar campos obligatorios
-  if p_fecha is null OR
-     trim(p_descripcion) = '' OR
-     p_monto is null OR
-     p_categoria_id is null OR
-     p_metodo_pago_id is null OR
-     p_socio_id is null then
-    return query
-      select 'warning', 'Debe completar todos los campos obligatorios';
-    return;
-  end if;
-  begin insert into t_gastos(
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  v_cantidad_socios INT;
+BEGIN
+  -- validar campos obligatorios
+  IF p_fecha IS NULL
+     OR trim(p_descripcion) = ''
+     OR p_monto IS NULL
+     OR p_categoria_id IS NULL
+     OR p_metodo_pago_id IS NULL
+     OR p_socio_id IS NULL THEN
+    RETURN QUERY
+      SELECT 'warning', 'Debe completar todos los campos obligatorios';
+    RETURN;
+  END IF;
+
+  SELECT COUNT(*)
+  INTO v_cantidad_socios
+  FROM t_socios;
+
+  IF v_cantidad_socios = 0 THEN
+    RETURN QUERY
+      SELECT 'error', 'No hay socios registrados';
+    RETURN;
+  END IF;
+
+  -- insertar gasto
+  INSERT INTO t_gastos(
     fecha,
     descripcion,
     monto,
     categoria_id,
-    metodos_pago_id,
+    metodo_pago,
     socio_id
   )
-  values(
+  VALUES (
     p_fecha,
     p_descripcion,
     p_monto,
@@ -557,14 +564,19 @@ begin
     p_metodo_pago_id,
     p_socio_id
   );
-  return query
-  select 'success', 'Gasto agregado correctamente.';
-  return;
 
-  exception when others then
-    return query
-    select 'error', 'Error al insertar: ' || sqlerrm;
-    return;
-  end;  
-end;
-$$ language plpgsql;
+  -- repartir gasto entre todos los socios
+  UPDATE t_socios
+  SET gastos_generados =
+    COALESCE(gastos_generados, 0) + (p_monto / v_cantidad_socios)
+  WHERE socio_id IS NOT NULL;
+
+  RETURN QUERY
+    SELECT 'success', 'Gasto registrado correctamente';
+
+EXCEPTION WHEN OTHERS THEN
+  RETURN QUERY
+    SELECT 'error', 'Error al insertar: ' || SQLERRM;
+END;
+$$;
+

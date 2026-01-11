@@ -1,10 +1,8 @@
-drop function fn_read_partners()
 CREATE OR REPLACE FUNCTION fn_read_partners()
 returns table(
   socio_id INT,
   nombre VARCHAR,
   porcentaje_participacion DECIMAL,
-  rol_id INT,
   email VARCHAR,
   telefono VARCHAR,
   inversion_inicial DECIMAL,
@@ -28,7 +26,6 @@ begin
         soc.telefono,
         soc.inversion_inicial,
         soc.ganancia_neta,
-        soc.rol_id,
         r.nombre AS rol_nombre,
         soc.ventas_generadas,
         soc.gastos_generados,
@@ -74,12 +71,6 @@ end
 $$;
 
 
-select * from fn_read_partners()
-select * from fn_read_ventas()
-select * from t_clientes
-select * from t_roles_socios
-drop function fn_read_ventas()
-
 CREATE OR REPLACE FUNCTION fn_read_ventas()
 RETURNS TABLE(
   venta_id INT,
@@ -97,36 +88,37 @@ AS $$
 BEGIN
   IF EXISTS (SELECT 1 FROM t_ventas) THEN
     RETURN QUERY
-      SELECT 
-        v.venta_id,
-        v.fecha,
-        c.nombre AS cliente_nombre,
-        s.nombre AS servicio_nombre,
-        v.monto,
-        mp.metodo_pago,
-        COALESCE(
-          STRING_AGG(so.nombre, ', ' ORDER BY so.nombre),
-          'Sin socios'
-        ) AS socios_participantes,
-        'success' AS msj_tipo,
-        'Éxito al realizar la acción' AS msj_texto
-      FROM t_ventas v
-      LEFT JOIN t_clientes c 
-        ON c.cliente_id = v.cliente_id
-      LEFT JOIN t_servicios s 
-        ON s.servicio_id = v.servicio_id
-      LEFT JOIN t_ventas_socios vs 
-        ON vs.venta_id = v.venta_id
-      LEFT JOIN t_socios so 
-        ON so.socio_id = vs.socio_id
-      left join t_metodos_pago mp on mp.metodos_pago_id = v.metodo_pago
-      GROUP BY 
-        v.venta_id, 
-        v.fecha, 
-        c.nombre, 
-        s.nombre, 
-        v.monto, 
-        v.metodo_pago;
+  SELECT 
+    v.venta_id,
+    v.fecha,
+    c.nombre AS cliente_nombre,
+    s.nombre AS servicio_nombre,
+    v.monto,
+    mp.nombre AS metodo_pago,
+    COALESCE(
+      STRING_AGG(so.nombre, ', ' ORDER BY so.nombre),
+      'Sin socios'
+    ) AS socios_participantes,
+    'success' AS msj_tipo,
+    'Éxito al realizar la acción' AS msj_texto
+  FROM t_ventas v
+  LEFT JOIN t_clientes c 
+    ON c.cliente_id = v.cliente_id
+  LEFT JOIN t_servicios s 
+    ON s.servicio_id = v.servicio_id
+  LEFT JOIN t_ventas_socios vs 
+    ON vs.venta_id = v.venta_id
+  LEFT JOIN t_socios so 
+    ON so.socio_id = vs.socio_id
+  LEFT JOIN t_metodos_pago mp 
+    ON mp.metodos_pago_id = v.metodo_pago_id
+  GROUP BY 
+    v.venta_id, 
+    v.fecha, 
+    c.nombre, 
+    s.nombre, 
+    v.monto, 
+    mp.nombre;
 
   ELSE
     RETURN QUERY
@@ -157,6 +149,67 @@ EXCEPTION WHEN OTHERS THEN
 END
 $$;
 
+
+
+CREATE OR REPLACE FUNCTION fn_read_productos()
+returns table(
+  producto_id INT,
+  nombre VARCHAR,
+  stock INT,
+  stock_minimo int,
+  precio decimal,
+  categoria_nombre varchar,
+  msj_tipo text,
+  msj_texto text
+)
+language plpgsql
+as $$
+begin 
+  if exists (select 1 from t_socios) then 
+    return query 
+      select 
+        prod.productos_id,
+        prod.nombre,
+        prod.stock,
+        prod.stock_minimo,
+        prod.precio,
+        cat.nombre as categoria_nombre,
+        'success' as msj_tipo,
+        'Exito al realizar la accion' as msj_texto
+        from t_productos prod
+        left join t_categorias_inventario cat
+          on cat.categorias_invetario_id = prod.categoria_id;
+
+
+  else 
+    return query
+      select 
+        NULL::INT,
+        NULL::VARCHAR,
+        NULL::INT,
+        NULL::INT,
+        NULL::DECIMAL,
+        NULL::VARCHAR,
+        'warning' as msj_tipo,
+        'Actualmente no hay productos registrados.' as msj_texto;
+  end if;
+
+exception when others then 
+  return query
+    select 
+        NULL::INT,
+        NULL::VARCHAR,
+        NULL::INT,
+        NULL::INT,
+        NULL::DECIMAL,
+        NULL::VARCHAR,
+      'error' as msj_tipo,
+      sqlerrm as msj_texto;
+end
+$$;
+
+
+select * from fn_read_productos()
 
 CREATE OR REPLACE FUNCTION fn_read_gastos()
 returns table(
@@ -218,16 +271,20 @@ exception when others then
       sqlerrm as msj_texto;
 end
 $$;
-
+select * from fn_read_gastos()
 
 create or replace function fn_read_clientes()
 returns table(
+  client_id int,
   nombre varchar,
   email varchar,
   telefono varchar,
   vehiculo varchar,
   placa varchar,
   rol_cliente_nombre varchar,
+  total_gastado numeric,
+  total_visitas bigint,
+  ultima_visita timestamp,
   msj_tipo text,
   msj_texto text
 )
@@ -235,43 +292,69 @@ language plpgsql
 as $$
 begin
   if exists (select 1 from t_clientes) then
-  return query
-  select
-    c.nombre,
-    c.email,
-    c.telefono,
-    c.vehiculo,
-    c.placa,
-    rc.nombre as rol_cliente_nombre,
-    'success' as msj_tipo,
-    'Exito al realizar la accion' as msj_texto
-    from t_clientes c 
-    left join t_roles_clientes rc on rc.roles_clientes_id = c.rol_cliente_id;
-    
-  else
-  return query
-  select 
-    NULL::VARCHAR,
-    NULL::VARCHAR,
-    NULL::VARCHAR,
-    NULL::varchar,
-    NULL::varchar,
-    NULL::varchar,
-    'warning' as msj_tipo,
-    'Actualmente no hay clientes registrados.' as msj_texto;
-  end if;
-  exception when others then
     return query
-      select 
-        NULL::VARCHAR,
-        NULL::VARCHAR,
-        NULL::VARCHAR,
-        NULL::varchar,
-        NULL::varchar,
-        NULL::varchar,
-        'error' as msj_tipo,
-        sqlerrm as msj_texto; 
-  end
-$$; 
+    select
+      c.cliente_id::int,
+      c.nombre::varchar,
+      c.email::varchar,
+      c.telefono::varchar,
+      c.vehiculo::varchar,
+      c.placa::varchar,
+      rc.nombre::varchar,
+
+      coalesce(sum(v.monto), 0)::numeric as total_gastado,
+      coalesce(count(v.venta_id), 0)::bigint as total_visitas,
+      max(v.fecha)::timestamp as ultima_visita,
+
+      'success'::text as msj_tipo,
+      'Exito al realizar la accion'::text as msj_texto
+    from t_clientes c
+    left join t_roles_clientes rc
+      on rc.roles_clientes_id = c.rol_cliente_id
+    left join t_ventas v
+      on v.cliente_id = c.cliente_id
+    group by
+      c.cliente_id,
+      c.nombre,
+      c.email,
+      c.telefono,
+      c.vehiculo,
+      c.placa,
+      rc.nombre;
+
+  else
+    return query
+    select 
+      NULL::int,
+      NULL::varchar,
+      NULL::varchar,
+      NULL::varchar,
+      NULL::varchar,
+      NULL::varchar,
+      NULL::varchar,
+      0::numeric,
+      0::bigint,
+      NULL::timestamp,
+      'warning'::text,
+      'Actualmente no hay clientes registrados.'::text;
+  end if;
+
+exception when others then
+  return query
+    select 
+      NULL::int,
+      NULL::varchar,
+      NULL::varchar,
+      NULL::varchar,
+      NULL::varchar,
+      NULL::varchar,
+      NULL::varchar,
+      0::numeric,
+      0::bigint,
+      NULL::timestamp,
+      'error'::text,
+      sqlerrm::text; 
+end
+$$;
 
 select * from fn_read_clientes()

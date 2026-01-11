@@ -69,8 +69,8 @@ function FormEditPartner(){
             !isValidNumero(porcentaje_participacion) ||
             !isValidNumero(inversion_inicial) ||
             !isValidNumero(ganancia_neta) ||
-            !isValidNumero(ventas_generadas) ||
-            !isValidNumero(gastos_generados)
+            !isValidNumero(ventas_generadas) 
+            // !isValidNumero(gastos_generados)
           ){
                 Swal.fire({
                     icon: "warning",
