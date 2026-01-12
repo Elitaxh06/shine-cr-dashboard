@@ -5,6 +5,7 @@ import { deleteClient } from "../../service/clients.services"
 
 import Swal from "sweetalert2"
 import "./trash.css"
+import { deleteProduct } from "../../service/inventary.services"
 
 export default function TrashIcon({id, onDelete, nameToDelete}:{id:number, onDelete:() => void, nameToDelete: string}) {
 
@@ -16,6 +17,8 @@ export default function TrashIcon({id, onDelete, nameToDelete}:{id:number, onDel
         message = "La venta ha sido eliminada"
     }else if(nameToDelete === 'expense'){
         message = "El gasto ha sido eliminado"
+    }else if(nameToDelete === 'product'){
+        message = "El producto ha sido eliminado"
     }
   
     const handleDeleteSale = async (id:number) => {
@@ -30,6 +33,9 @@ export default function TrashIcon({id, onDelete, nameToDelete}:{id:number, onDel
               break
             case "client":
               result = await deleteClient(id)
+              break
+            case "product":
+              result = await deleteProduct(id)
               break
             default:
               break

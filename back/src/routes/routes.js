@@ -17,7 +17,8 @@ import {
 import {
     createCategoryInventary,
     createProduct,
-    readProducts
+    readProducts,
+    deleteProduct
 } from "../controller/inventary.controller.js"
 import { 
     createMethodPayment,
@@ -60,6 +61,7 @@ routes.delete("/delete-sale/:id", deleteSale)
 routes.post("/create-category-inventary", createCategoryInventary)
 routes.post("/create-product", createProduct)
 routes.get("/read-products", readProducts)
+routes.delete("/delete-product/:id", deleteProduct)
 
 
 // ROUTES FOR EXPENSES

@@ -63,7 +63,8 @@ export const expenseRoutes = {
 export const inventoryRoutes = {
     read_inventory: ruta_apis_inventory + import.meta.env.VITE_API_GET_PRODUCTS,
     create_category_inventory: ruta_apis_inventory + import.meta.env.VITE_API_CREATE_CATEGORY_INVENTORY,
-    create_product: ruta_apis_inventory + import.meta.env.VITE_API_CREATE_PRODUCT
+    create_product: ruta_apis_inventory + import.meta.env.VITE_API_CREATE_PRODUCT,
+    delete_product: ruta_apis_inventory + import.meta.env.VITE_API_DELETE_PRODUCT,
 }
 
 export const clientRoutes = {

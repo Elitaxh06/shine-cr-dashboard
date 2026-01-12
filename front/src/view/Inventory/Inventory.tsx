@@ -14,6 +14,7 @@ import type { Inventary } from "../../types/invetary.types"
 import { Loader1 } from "../../components/loaders/loader1"
 import { Link } from "react-router-dom"
 import Fuse from "fuse.js"
+import TrashIcon from "../../components/svg-icons/Trash"
 
 function Inventory() {
     const [products, setProducts] = useState<Inventary[]>([])
@@ -77,6 +78,12 @@ function Inventory() {
 
       return matchesSearch && matchesCategory && matchesStock
     })
+
+
+
+  const handleDeleteProduct = () => {
+      getInitialData()
+  }
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -253,6 +260,15 @@ function Inventory() {
 
                         <TableCell className="font-semibold">
                           ₡{(item.stock * item.precio).toLocaleString()}
+                          
+                        </TableCell>
+
+                        <TableCell>
+                            <TrashIcon 
+                                id={item.producto_id}
+                                onDelete={handleDeleteProduct}
+                                nameToDelete="product"
+                            />
                         </TableCell>
                       </TableRow>
                     )
