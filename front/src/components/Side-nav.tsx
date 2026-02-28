@@ -94,7 +94,7 @@ export function SidebarNav({ onClose }: SidebarNavProps) {
                   variant="ghost"
                   className={cn(
                     "w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer",
-                    isActive && "bg-sidebar-accent text-sidebar-accent-foreground",
+                    isActive && "bg-sidebar-accent text-sidebar-accent-foreground cursor-pointer",
                   )}
                   onClick={onClose}
                 >

@@ -47,47 +47,71 @@ export const createSale = async (req, res) => {
 }
 
 export const readSales = async (req, res) => {
-    try{
-        const { data } = await axios.post(
-            process.env.URL_READ_SALES,
-            {},
+    try {
+        const now = new Date()
+
+        const year = req.query.year
+            ? Number(req.query.year)
+            : now.getFullYear()
+
+        const month = req.query.month
+            ? Number(req.query.month)
+            : now.getMonth() + 1
+
+        const startDate = new Date(year, month - 1, 1)
+        const endDate = new Date(year, month, 1)
+
+        const start = startDate.toISOString().split("T")[0]
+        const end = endDate.toISOString().split("T")[0]
+
+        const { data } = await axios.get(
+            `${process.env.URL_READ_SALES}?fecha=gte.${start}&fecha=lt.${end}`,
             {
                 headers: {
-                    "Content-Type": "application/json",
-                    "apikey": process.env.API_KEY,
-                    "Authorization": `Bearer ${process.env.AUTHORIZATOIN}`
-                },
+                    apikey: process.env.API_KEY,
+                    Authorization: `Bearer ${process.env.AUTHORIZATOIN}`
+                }
             }
         )
-        const result = data
-        // constantes que se repiten
+        const result = data 
+        // vamos hacer una constantes que se repiten
         const { msj_tipo, msj_texto} = result[0]
-        const respuesta = result
+        // extraemos este mensaje que siempre va a ser el mismo (success, warning, error)
         const mensajeCompletoSuccess = {
             "resultadoTipo" : msj_tipo,
             "resultadoTexto" : msj_texto,
-            "datos" : respuesta,
-            "mensaje" : mensaje + ' la lista de ventas'
+            "datos" : result,
+            "mensaje" : mensaje + ` las ventas del mes ${month}/${year}`
         }
-        const mensajeCompletoWarningError = {
+
+        const mensajeCompletoWarningError ={
             "resultadoTipo" : msj_tipo,
             "resultadoTexto" : msj_texto,
             "datos" : null,
-            "mensaje" : mensaje + ' la lista de ventas'
+            "mensaje" : mensaje + ` las ventas del mes ${month}/${year}`
         }
 
-        // devolver la respuesta
         if(msj_tipo === 'success'){
             return res.json(mensajeCompletoSuccess)
         }else if(msj_tipo === 'warning' || msj_tipo === 'error'){
             return res.json(mensajeCompletoWarningError)
         }
 
+        // return res.json({
+        //     resultadoTipo: "success",
+        //     resultadoTexto: "Ventas obtenidas correctamente",
+        //     datos: data,
+        //     mensaje: "Este endpoint devuelve la lista de ventas del mes"
+        // })
+
         return res.json(result)
 
-    }catch(error){
-        return res.status(500).json({ mensaje: error.message });
     }
+    catch(error){
+        console.log(error)
+        return res.status(500).json({ mensaje: error.message })
+    }
+
 }
 
 export const UpdateTotalSale = async (req, res) => {

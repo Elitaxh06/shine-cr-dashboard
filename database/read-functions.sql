@@ -358,3 +358,42 @@ end
 $$;
 
 select * from fn_read_clientes()
+
+
+create or replace function fn_read_method_payment()
+returns table(
+  metodos_pago_id int,
+  nombre varchar,
+  msj_tipo text  
+  msj_texto text,
+)
+language plpgsql
+as $$
+begin
+  if exists (select 1 from t_metodos_pago) then
+    return query
+    select 
+      mp.metodos_pago_id::int,
+      mp.nombre::varchar,
+      'success'::text as msj_tipo,
+      'Exito al realizar la consulta'::text as msj_texto
+    from t_metodos_pago mp;
+  else 
+    return query
+    select 
+      NULL::int,
+      NULL::varchar,
+      'warning'::text,
+      'Actualmente no hay metodos de pago registrados.'::text;
+
+    exception when other then
+      return query
+      select 
+        NULL::int,
+        NULL::varchar,
+        'error'::text,
+        sqlerrm::text;
+  end if;
+
+end
+$$;

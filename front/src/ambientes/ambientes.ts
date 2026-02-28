@@ -1,13 +1,14 @@
 let Ambiente = '';
 
-// Ambiente = 'dev';
-Ambiente = 'prod';
+Ambiente = 'dev';
+// Ambiente = 'prod';
 
 let ruta_apis_partners = ''
 let ruta_apis_sales =''
 let ruta_apis_expenses
 let ruta_apis_inventory = ''
 let ruta_apis_clients = ''
+let ruta_apis_method_payment = ''
 
 
 
@@ -18,7 +19,9 @@ switch (Ambiente) {
         ruta_apis_sales = 'http://localhost:3001/api/'
         ruta_apis_expenses = 'http://localhost:3001/api/'
         ruta_apis_inventory = 'http://localhost:3001/api/'
-        ruta_apis_clients = 'http://localhost:3001/api/'
+        ruta_apis_clients = 'http://localhost:3001/api/',
+        ruta_apis_method_payment = 'http://localhost:3001/api/'
+
         break;
     case 'prod':
         ruta_apis_partners = 'https://shine-cr-dashboard-backend.onrender.com/api/'
@@ -26,13 +29,16 @@ switch (Ambiente) {
         ruta_apis_expenses = 'https://shine-cr-dashboard-backend.onrender.com/api/'
         ruta_apis_inventory = 'https://shine-cr-dashboard-backend.onrender.com/api/'
         ruta_apis_clients = 'https://shine-cr-dashboard-backend.onrender.com/api/'
+        ruta_apis_method_payment = 'https://shine-cr-dashboard-backend.onrender.com/api/'
+
         break;  
     default:
         ruta_apis_partners = 'http://localhost:3001/api/'
         ruta_apis_sales = 'http://localhost:3001/api/'
         ruta_apis_expenses = 'http://localhost:3001/api/'
         ruta_apis_inventory = 'http://localhost:3001/api/'
-        ruta_apis_clients = 'http://localhost:3001/api/'       
+        ruta_apis_clients = 'http://localhost:3001/api/'      
+        ruta_apis_method_payment = 'http://localhost:3001/api/' 
 }
 
 
@@ -71,4 +77,8 @@ export const clientRoutes = {
     read_clients: ruta_apis_clients + import.meta.env.VITE_API_GET_CLIENTS,
     create_client: ruta_apis_clients + import.meta.env.VITE_API_CREATE_CLIENTS,
     delete_client: ruta_apis_clients + import.meta.env.VITE_API_DELETE_CLIENTS
+}
+
+export const methodPaymentRoutes = {
+    read_methods_payments: ruta_apis_method_payment + import.meta.env.VITE_API_READ_METHODS_PAYMENTS
 }

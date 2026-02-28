@@ -37,6 +37,10 @@ import {
 } from "../controller/clients.controller.js"
 
 
+import {
+    getMethodPayment
+} from "../controller/method_payment.controller.js"
+
 const routes = Router()
 
 
@@ -72,5 +76,7 @@ routes.post("/create-expense", createExpenses)
 routes.delete("/delete-expense/:id", deleteExpense)
 
 
+// ROUTES FOR METHOD PAYMENT
+routes.get("/get-method-payment", getMethodPayment)
 
 export default routes

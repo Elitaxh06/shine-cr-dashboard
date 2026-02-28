@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createExpenses } from "../../service/expense.services";
 import { useNavigate } from "react-router-dom";
+import { getMethodPayments } from "../../service/method_payments.services";
 import Swal from "sweetalert2";
-
+import type { MethodPayment } from "../../types/method_payments.types";
 
 
 const categoriaList = [
@@ -15,6 +16,9 @@ const categoriaList = [
     { id: 7, name: "Alquiler"},
     { id: 8, name: "Repraciones"},
     { id: 9, name: "Insumos"},
+    { id: 10, name: "Inventario"},
+    { id: 11, name: "Limpieza"},
+    { id: 12, name: "Bonos"},
 ]
 
 const metodoList = [
@@ -42,6 +46,22 @@ function CreateExpense() {
     const [ categoria_id, setCategoria_id ] = useState<number>(0)
     const [ metodo_pago_id, setMetodo_pago_id ] = useState<number>(0)
     const [ socio_id, setSocio_id ] = useState<number>(0)
+    const [ method_payments_id, setMethod_payments_id ] = useState<MethodPayment[]>([])
+
+    const getMethodPayment = async () => {
+        try{
+
+            const data = await getMethodPayments()
+            setMethod_payments_id(data?.datos ?? [])
+        }catch(error){
+            return null
+        }
+    }
+
+    useEffect(() => {
+        getMethodPayment()
+    }, [])
+
 
     const insertHandlerExpense = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -54,6 +74,7 @@ function CreateExpense() {
             return
         }
         try{
+            
             const result = await createExpenses({
                 p_fecha: fecha,
                 p_descripcion: descripcion,

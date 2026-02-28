@@ -3,11 +3,16 @@ import axios from 'axios';
 import { saleRoutes } from '../ambientes/ambientes';
 import type { ApiResponseSales } from '../types';
 
-export const readSales = async (): Promise<ApiResponseSales | null> => {
+export const readSales = async (
+    year?: number,
+    month? : number
+): Promise<ApiResponseSales | null> => {
+    
     try{
         const { data } = await axios.get<ApiResponseSales>(
             saleRoutes.read_sales,
             {
+                params:{ year, month },
                 headers: {
                     'Content-Type': 'application/json',
                 }
@@ -24,11 +29,11 @@ export const readSales = async (): Promise<ApiResponseSales | null> => {
         return data
 
     }catch(error){
-        Swal.fire({
-            icon: "error",
-            title: "Para su informacion",
-            text: "Error al obtener los datos"
-        })
+        // Swal.fire({
+        //     icon: "error",
+        //     title: "Para su informacion",
+        //     text: "Error al obtener los datos"
+        // })
         console.log('Error al obtener los datos', error)
         return null
     }
