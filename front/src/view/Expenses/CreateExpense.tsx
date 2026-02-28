@@ -21,15 +21,6 @@ const categoriaList = [
     { id: 12, name: "Bonos"},
 ]
 
-const metodoList = [
-    { id: 1, name: "Efectivo"},
-    { id: 2, name: "Sinpe Movil"},
-    { id: 3, name: "Transferencia Bancaria"},
-    { id: 4, name: "Tarjeta"},
-    { id: 5, name: "Puntos"},
-    { id: 6, name: "Credito"},
-]
-
 const sociosList = [
     {id:4, name: "Esteban"},
     {id:5, name: "Steven"},
@@ -189,8 +180,8 @@ function CreateExpense() {
                         id="metodo_pago_id"
                     >
                     <option value={0}>Escoja un metodo de pago</option>
-                    {metodoList.map((rol) => (
-                        <option value={rol.id} key={rol.id}>{rol.name}</option>
+                    {method_payments_id.map((metodo) => (
+                        <option value={metodo.metodos_pago_id} key={metodo.metodos_pago_id}>{metodo.nombre}</option>
                     ))}
                     </select>
                     
