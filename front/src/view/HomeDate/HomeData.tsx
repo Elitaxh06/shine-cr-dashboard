@@ -1,4 +1,4 @@
-import { getTotalSalesThisMonth, logUniqueClientsThisMonth } from "../../utils/sale.utils.ts/sale.utils"
+import { logUniqueClientsThisMonth } from "../../utils/sale.utils.ts/sale.utils"
 // import { getTotalExpensesThisMonth } from "../../utils/expense.utils.ts/expense.utils"
 import { readSales } from "../../service/sale.services"
 import { useState, useEffect } from "react"
