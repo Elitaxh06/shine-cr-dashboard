@@ -12,6 +12,7 @@ import supabase from "../../helper/supabaseClient";
 // importaciones de shadcn
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Button } from "../../components/ui/button"
+import { CalendarIcon } from "lucide-react";
 // import { Input } from "../../components/ui/input"
 // import { Label } from "../../components/ui/label"
 // import { Textarea } from "../../components/ui/textarea"
@@ -31,6 +32,11 @@ import { Badge } from "../../components/ui/badge"
 
 
 function Expenses() {
+    const expensesTodays = new Date()
+
+    const [year, setYear] = useState(expensesTodays.getFullYear())
+    const [month, setMonth] = useState(expensesTodays.getMonth() + 1)
+
     const [expenses, setExpenses ] = useState<Expense[]>([])
     const [loading, setLoading] = useState(true)
     const [ role, setRole ] = useState<string | null>(null)
@@ -44,8 +50,9 @@ function Expenses() {
     const filteredExpenses = search ? fuse.search(search).map((result) => result.item) : expenses
     
     const getInitialData = async () => {
+        
         try{
-            const data = await readExpenses()
+            const data = await readExpenses(year, month)
             setExpenses(data?.datos ?? [])
             setLoading(false)
         }catch(error){
@@ -55,9 +62,6 @@ function Expenses() {
             setLoading(false)
         }
     }
-
-
-
 
     // operaciones prar ver los datos
     const totalExpenses = expenses.reduce((sum, expense) => sum + expense.monto, 0)
@@ -79,7 +83,7 @@ function Expenses() {
 
     useEffect(() => {
       getInitialData()
-    }, [])
+    }, [year, month])
 
 
     useEffect(() => {
@@ -134,9 +138,23 @@ function Expenses() {
       </Link>
     )}
   </div>
+    <div className="flex items-center justify-start">
+              <div className="relative">
+                <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="month"
+                  onChange={(e) => {
+                    const [y, m] = e.target.value.split("-")
+                    setYear(Number(y))
+                    setMonth(Number(m))
+                  }}
+                  value={`${year}-${month.toString().padStart(2, '0')}`}
+                  className="pl-10 pr-3 py-2 h-10 border rounded-md bg-white text-sm shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
 
-
-
+    
 
   {/* Stats Cards */}
   <div className="grid gap-4 md:grid-cols-3">

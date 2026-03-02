@@ -16,6 +16,7 @@ export const createSale = async (req, res) => {
             }
         )
         const result = data
+    
         // constantes que se repiten
         const { msj_tipo, msj_texto} = result[0]
         const respuesta = result
@@ -75,8 +76,21 @@ export const readSales = async (req, res) => {
         )
         const result = data 
         // vamos hacer una constantes que se repiten
-        const { msj_tipo, msj_texto} = result[0]
+        if(!Array.isArray(result) || result.length === 0){
+            const mensajeSinDatos = {
+                "resultadoTipo": "warning",
+                "resultadoTexto": "No hay ventas en este periodo",
+                "datos": null,
+                "mensaje": mensaje + ' las ventas'
+            }
+            return res.json(mensajeSinDatos)
+        }
+
+        
+          const { msj_tipo, msj_texto} = result[0]
         // extraemos este mensaje que siempre va a ser el mismo (success, warning, error)
+
+        
         const mensajeCompletoSuccess = {
             "resultadoTipo" : msj_tipo,
             "resultadoTexto" : msj_texto,

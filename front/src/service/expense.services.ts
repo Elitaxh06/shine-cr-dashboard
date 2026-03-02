@@ -4,11 +4,15 @@ import Swal from "sweetalert2"
 import { expenseRoutes } from "../ambientes/ambientes"
 
 
-export const readExpenses = async (): Promise<apiResponseExpense | null> => {
+export const readExpenses = async (
+    year?: number,
+    month?: number
+): Promise<apiResponseExpense | null> => {
     try{
         const { data } = await axios.get(
             expenseRoutes.read_expenses,
             {
+                params: { year, month },
                 headers: {
                     "Content-Type": "application/json", 
                 }

@@ -5,7 +5,7 @@ import type { Sale } from "../../types";
 
 export function getTotalSalesThisMonth(sales: Sale[]): number {
   const today = new Date();
-  const currentMonth = today.getMonth();
+  const currentMonth = today.getMonth()   ;
   const currentYear = today.getFullYear();
 
   const salesThisMonth = sales.filter(sale => {
